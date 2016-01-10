@@ -1,0 +1,33 @@
+---
+title: "Experimenting with simulated data"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+K <- 50 # number of columns of Y
+J <- 200 # number of columns of X
+J0 <- 75 # number of columns of X actually contribute
+n <- 500 # number of samples
+
+B <- matrix(rnorm(J * K), J, K)
+B[sample(J, J0), ] <- 0
+X <- matrix(rnorm(n * J), n, J)
+
+Y <- X %*% B + matrix(10 * rnorm(n * K), n, K)
+test <- cv.glmnet(x = X, y = Y[, 1])
+
+R <- matrix(runif(K * K, 0, 0.5), K, K)
+R <- R + t(R)
+R[abs(R) < .7] <- 0
+```
+
+
+
+
+
