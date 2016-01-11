@@ -20,6 +20,6 @@ THe C matrix defined on page 6 of the reference.
 Get C matrix giving L1 penalization
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 

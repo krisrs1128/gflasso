@@ -20,6 +20,6 @@ The optimal A matrix defined by Lemma 1.
 Get optimal A matrix from the dual norm representation
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 

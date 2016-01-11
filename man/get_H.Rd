@@ -16,6 +16,6 @@ The matrix H defined on page 6 of the reference.
 Get H matrix giving Graph Penalization
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 

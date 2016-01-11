@@ -25,6 +25,6 @@ reference.
 Proximal Gradient Descent for Graph Fused Lasso
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 

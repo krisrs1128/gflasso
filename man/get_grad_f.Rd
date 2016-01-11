@@ -25,6 +25,6 @@ See equation (11) in the reference.
 Calculate the gradient for one step
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 

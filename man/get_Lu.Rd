@@ -24,6 +24,6 @@ Lu The automatically chosen step sizes defined by equation (12)
 Get automatic step-sizes
 }
 \references{
-Smoothing proximal gradient method for general structured sparse regression
+Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 }
 
