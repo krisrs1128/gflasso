@@ -25,9 +25,6 @@ test <- cv.glmnet(x = X, y = Y[, 1])
 R <- matrix(runif(K * K, 0, 0.5), K, K)
 R <- R + t(R)
 R[abs(R) < .7] <- 0
+
+res <- gflasso(Y, X, R, list(delta_conv = 1e-4, lambda = 1, gamma = 1))
 ```
-
-
-
-
-
