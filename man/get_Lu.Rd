@@ -4,12 +4,12 @@
 \alias{get_Lu}
 \title{Get automatic step-sizes}
 \usage{
-get_Lu(X, R, lambda, gamma, mu)
+get_Lu(X, H, lambda, gamma, mu)
 }
 \arguments{
 \item{X}{The data matrix.}
 
-\item{R}{The matrix of (thresholded) correlations between columns of Y}
+\item{H}{The matrix H defined in the reference.}
 
 \item{lambda}{The l1 regularization parameter.}
 
@@ -18,12 +18,12 @@ get_Lu(X, R, lambda, gamma, mu)
 \item{mu}{The smoothing parameter.}
 }
 \value{
-Lu The automatically chosen step sizes defined by equation (12)
+Lu The automatically chosen step sizes defined in the reference.
 }
 \description{
 Get automatic step-sizes
 }
 \references{
-Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
+Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }
 

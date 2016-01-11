@@ -10,12 +10,12 @@ get_H(R)
 \item{R}{The matrix of (thresholded) correlations between columns of Y}
 }
 \value{
-The matrix H defined on page 6 of the reference.
+The matrix H defined in the reference.
 }
 \description{
 Get H matrix giving Graph Penalization
 }
 \references{
-Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
+Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }
 
