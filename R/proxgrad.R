@@ -111,6 +111,6 @@ proxgrad <- function(Y, X, R, opts = list()) {
     B <- B_new
     t <- t + 1
   }
-  list(B = B, obj = obj, Z = Z, W = W, grad_f = grad_f, Lu = Lu)
+  list(B = B, obj = unlist(obj), Z = Z, W = W, grad_f = grad_f, Lu = Lu)
 }
 
