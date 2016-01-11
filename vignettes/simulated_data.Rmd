@@ -19,11 +19,11 @@ B <- matrix(rnorm(J * K), J, K)
 B[sample(J, J0), ] <- 0
 X <- matrix(rnorm(n * J), n, J)
 
-Y <- X %*% B + matrix(1 * rnorm(n * K), n, K)
+Y <- X %*% B + matrix(10 * rnorm(n * K), n, K)
 test <- cv.glmnet(x = X, y = Y[, 1])
 
 R <- matrix(1, K, K) # tie all the responses together
-res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 10, gamma = 10, iter_max = 5000))
+res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 1, gamma = 1, iter_max = 5000))
 
 image(B == 0)
 image(res$B == 0)
