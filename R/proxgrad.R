@@ -84,6 +84,11 @@ proxgrad <- function(Y, X, R, opts = list()) {
   H <- get_H(R)
   C <- get_C(H, opts$lambda, opts$gamma)
 
+  # center data
+  means <- list(X = colMeans(X), Y = colMeans(Y))
+  X <- scale(X, center = T, scale = F)
+  Y <- scale(Y, center = T, scale = F)
+
   # calculate automatic step size
   D <- (1 / 2) * J * (K + ncol(H) / 2)
   mu <- opts$eps / (2 * D)
@@ -97,6 +102,7 @@ proxgrad <- function(Y, X, R, opts = list()) {
   obj <- list()
 
   t <- 1
+  cat("iter \t | obj \t | |B(t + 1) - B(t)|")
   while(TRUE) {
     # make a step
     grad_f[[t]] <- get_grad_f(X, Y, B, C, mu)
@@ -108,9 +114,11 @@ proxgrad <- function(Y, X, R, opts = list()) {
     delta <- sum(abs(B_new - B))
     obj[[t]]  <- objective(X, B, R, C)
     if(delta < opts$delta_conv | t > opts$iter_max) break
+    cat(sprintf("%d \t | %f \t | %f \n", t, obj[[t]], delta))
     B <- B_new
     t <- t + 1
+
   }
-  list(B = B, obj = unlist(obj), Z = Z, W = W, grad_f = grad_f, Lu = Lu)
+  list(B = B, obj = unlist(obj), Z = Z, W = W, grad_f = grad_f, Lu = Lu, means = means)
 }
 
