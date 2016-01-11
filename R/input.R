@@ -10,7 +10,7 @@
 #' @export
 get_H <- function(R) {
   K <- nrow(R)
-  R[lower.tri(R)] <- 0
+  R[lower.tri(R, diag = TRUE)] <- 0
   R_obs <- which(R != 0, arr.ind = T)
   H <- matrix(0, K, nrow(R_obs))
   dimnames(H) <- list(1:K, apply(R_obs, 1, paste0, collapse = "-"))
