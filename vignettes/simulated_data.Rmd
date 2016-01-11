@@ -11,20 +11,24 @@ vignette: >
 
 ```{r}
 K <- 50 # number of columns of Y
-J <- 200 # number of columns of X
-J0 <- 75 # number of columns of X actually contribute
-n <- 500 # number of samples
+J <- 100 # number of columns of X
+J0 <- 10 # number of columns of X actually contribute
+n <- 200 # number of samples
 
 B <- matrix(rnorm(J * K), J, K)
 B[sample(J, J0), ] <- 0
 X <- matrix(rnorm(n * J), n, J)
 
-Y <- X %*% B + matrix(10 * rnorm(n * K), n, K)
+Y <- X %*% B + matrix(1 * rnorm(n * K), n, K)
 test <- cv.glmnet(x = X, y = Y[, 1])
 
-R <- matrix(runif(K * K, 0, 0.5), K, K)
-R <- R + t(R)
-R[abs(R) < .7] <- 0
+R <- matrix(1, K, K) # tie all the responses together
+res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 10, gamma = 10, iter_max = 5000))
 
-res <- gflasso(Y, X, R, list(delta_conv = 1e-4, lambda = 1, gamma = 1))
+image(B == 0)
+image(res$B == 0)
+
+plot(res$obj)
+plot(res$B, B)
+abline(a = 0, b = 1, col = "red")
 ```

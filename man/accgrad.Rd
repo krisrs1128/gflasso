@@ -4,20 +4,20 @@
 \alias{accgrad}
 \title{Nesterov's Accelerated Gradient Descent}
 \usage{
-accgrad(X, Y, H, opts)
+accgrad(X, Y, C, opts)
 }
 \arguments{
 \item{X}{The data matrix.}
 
 \item{Y}{The matrix of regression responses.}
 
-\item{H}{The matrix H defined in the reference.}
-
 \item{opts}{A list of gradient descent tuning parameters, \cr
 $iter_max: The maximum number of iterations.
 $mu: The smoothing parameter
 $lambda: The l1 regularization parameter
 $delta_conv: The convergence criterion for delta}
+
+\item{H}{The matrix H defined in the reference.}
 }
 \value{
 A list containing the following elements \cr

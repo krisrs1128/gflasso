@@ -4,18 +4,18 @@
 \alias{get_Lu}
 \title{Get automatic step-sizes}
 \usage{
-get_Lu(X, H, lambda, gamma, mu)
+get_Lu(X, C, lambda, gamma, mu)
 }
 \arguments{
 \item{X}{The data matrix.}
-
-\item{H}{The matrix H defined in the reference.}
 
 \item{lambda}{The l1 regularization parameter.}
 
 \item{gamma}{The graph regularization parameter.}
 
 \item{mu}{The smoothing parameter.}
+
+\item{H}{The matrix H defined in the reference.}
 }
 \value{
 Lu The automatically chosen step sizes defined in the reference.
