@@ -18,7 +18,8 @@ get_H <- function(R) {
   for(i in seq_len(nrow(R_obs))) {
     cur_row <- R_obs[i, 1]
     cur_col <- R_obs[i, 2]
-    tau_rij <- abs(R[cur_row, cur_col])
+    rij <- R[cur_row, cur_col]
+    tau_rij <- abs(rij)
     cur_h_col <- paste(R_obs[i, ], collapse = "-")
     H[cur_row, cur_h_col] <- tau_rij
     H[cur_col, cur_h_col] <- -sign(rij) * tau_rij

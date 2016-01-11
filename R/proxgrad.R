@@ -12,7 +12,7 @@
 #' @param mu The smoothing parameter.
 #' @return The gradient descent direction for B, given the current estimates.
 #' See equation (11) in the reference.
-#' @references Smoothing proximal gradient method for general structured sparse regression
+#' @references Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
 get_grad_f <- function(X, Y, B, C, mu) {
   A_opt <- get_A_opt(B, C, mu)
   t(X) %*% (X %*% B - Y) + A_opt %*% t(C)
@@ -86,8 +86,8 @@ proxgrad <- function(Y, X, R, opts = list()) {
 
   # calculate automatic step size
   D <- (1 / 2) * J * (K + ncol(H) / 2)
-  mu <- eps / (2 * D)
-  Lu <- get_Lu(X, R, lambda, gamma, mu)
+  mu <- opts$eps / (2 * D)
+  Lu <- get_Lu(X, R, opts$lambda, opts$gamma, mu)
 
   # initialize results
   W <- list(matrix(0, J, K))
