@@ -53,13 +53,13 @@ gflasso <- function(Y, X, R, opts = list()) {
   Y <- scale(Y, center = T, scale = F)
 
   # calculate automatic step size
-  D <- (1 / 2) * J * (K + ncol(H) / 2)
+  D <- (1 / 2) * J * (K + ncol(C) / 2)
   mu <- opts$eps / (2 * D)
-  Lu <- get_Lu(X, H, opts$lambda, opts$gamma, mu)
+  Lu <- get_Lu(X, C, opts$lambda, opts$gamma, mu)
 
-  accgrad_opts <- list(lambda = opts$lambda, Lu = opts$Lu, mu = opts$mu,
+  accgrad_opts <- list(lambda = opts$lambda, L = Lu, mu = mu,
                        iter_max = opts$iter_max, delta_conv = opts$delta_conv)
-  optim_result <- accgrad(X, Y, H, accgrad_opts)
+  optim_result <- accgrad(X, Y, C, accgrad_opts)
   list(B = optim_result$B, obj = optim_result$obj, Lu = Lu, means = means)
 }
 

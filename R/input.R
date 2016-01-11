@@ -36,7 +36,7 @@ get_H <- function(R) {
 #' @return Lu The automatically chosen step sizes defined in the reference.
 #' @references Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 #' @export
-get_Lu <- function(X, H, lambda, gamma, mu) {
+get_Lu <- function(X, C, lambda, gamma, mu) {
   eigen(t(X) %*% X)$values[1] +
-    (1 / mu) * (lambda ^ 2 + 2 * gamma ^ 2 * max(rowSums(H)))
+    (1 / mu) * (lambda ^ 2 + 2 * gamma ^ 2 * max(rowSums(C)))
 }

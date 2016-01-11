@@ -84,7 +84,7 @@ get_B_next <- function(W, grad_f, L, lambda) {
 #'   $B The final estimates of the multitask regression coefficients
 #'   $obj The objective function across gradient descent iterations
 #' @export
-accgrad <- function(X, Y, H, opts) {
+accgrad <- function(X, Y, C, opts) {
   # initialize results
   W <- matrix(0, ncol(X), ncol(Y))
   B <- matrix(0, ncol(X), ncol(Y))
@@ -95,7 +95,7 @@ accgrad <- function(X, Y, H, opts) {
   for(iter in seq_len(opts$iter_max)) {
     # make a step
     grad_f <- get_grad_f(X, Y, W, C, opts$mu)
-    B_next <- get_B_next(W, grad_f, L, opts$lambda)
+    B_next <- get_B_next(W, grad_f, opts$L, opts$lambda)
 
     theta_next <- 2 / (iter + 1)
     W <- B_next + ((1 - theta) / theta) * (theta_next) * (B_next - B)
@@ -104,8 +104,10 @@ accgrad <- function(X, Y, H, opts) {
     delta <- sum(abs(B_next - B))
     B <- B_next
     obj[iter]  <- objective(X, B, Y, C, opts$lambda)
-    cat(sprintf("%d \t | %f \t | %f \n", iter, obj[iter], delta))
-    if(delta < opts$delta_conv | t > opts$iter_max) break
+    if(iter %% 10 == 0) {
+      cat(sprintf("%d \t | %f \t | %f \n", iter, obj[iter], delta))
+    }
+    if(delta < opts$delta_conv | iter > opts$iter_max) break
     theta <- theta_next
   }
   list(B = B, obj = obj[seq_len(iter)])
