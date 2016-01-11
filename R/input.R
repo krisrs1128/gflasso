@@ -5,8 +5,8 @@
 
 #' @title Get H matrix giving Graph Penalization
 #' @param R The matrix of (thresholded) correlations between columns of Y
-#' @return The matrix H defined on page 6 of the reference.
-#' @references Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
+#' @return The matrix H defined in the reference.
+#' @references Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 #' @export
 get_H <- function(R) {
   K <- nrow(R)
@@ -27,42 +27,16 @@ get_H <- function(R) {
   H
 }
 
-#' @title Get C matrix giving L1 penalization
-#' @param H The H matrix output by \code{get_H()}.
-#' @param lambda The l1 regularization parameter.
-#' @param gamma The graph regularization parameter.
-#' @return THe C matrix defined on page 6 of the reference.
-#' @references Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
-#' @export
-get_C <- function(H, lambda, gamma) {
-  cbind(lambda * diag(nrow(H)), gamma * H)
-}
-
-#' @title Get optimal A matrix from the dual norm representation
-#' @param B The J x K regression coefficient estimates.
-#' @param C The L1 penalization matrix, returned by \code{get_C()}.
-#' @param mu The smoothing parameter.
-#' @return The optimal A matrix defined by Lemma 1.
-#' @references Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
-#' @export
-get_A_opt <- function(B, C, mu) {
-  A <- (1 / mu) * B %*% C
-  A[A > 1] <- 1
-  A[A < -1] <- -1
-  A
-}
-
 #' @title Get automatic step-sizes
 #' @param X The data matrix.
-#' @param R The matrix of (thresholded) correlations between columns of Y
+#' @param H  The matrix H defined in the reference.
 #' @param lambda The l1 regularization parameter.
 #' @param gamma The graph regularization parameter.
 #' @param mu The smoothing parameter.
-#' @return Lu The automatically chosen step sizes defined by equation (12)
-#' @references Graph-Structured Multi-task Regression adn Efficient Optimization for General Fused Lasso
+#' @return Lu The automatically chosen step sizes defined in the reference.
+#' @references Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 #' @export
-get_Lu <- function(X, R, lambda, gamma, mu) {
-  tau_R <- abs(R)
+get_Lu <- function(X, H, lambda, gamma, mu) {
   eigen(t(X) %*% X)$values[1] +
-    (1 / mu) * (lambda ^ 2 + 2 * gamma ^ 2 * max(colSums(tau_R ^ 2)))
+    (1 / mu) * (lambda ^ 2 + 2 * gamma ^ 2 * max(rowSums(H)))
 }
