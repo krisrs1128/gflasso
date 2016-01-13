@@ -53,7 +53,7 @@ gflasso <- function(Y, X, R, opts = list()) {
   Y <- scale(Y, center = T, scale = F)
 
   # calculate automatic step size
-  D <- (1 / 2) * J * (K + ncol(C) / 2)
+  D <- (1 / 2) * ncol(X) * (ncol(Y) + ncol(C) / 2)
   mu <- opts$eps / (2 * D)
   Lu <- get_Lu(X, C, opts$lambda, opts$gamma, mu)
 
