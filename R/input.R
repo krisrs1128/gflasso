@@ -12,7 +12,7 @@ get_H <- function(R) {
   K <- nrow(R)
   R[lower.tri(R, diag = TRUE)] <- 0
   R_obs <- which(R != 0, arr.ind = T)
-  H <- matrix(0, K, nrow(R_obs))
+  H <- matrix(0, K, max(nrow(R_obs), 1)) # protect against no-edges case
   dimnames(H) <- list(1:K, apply(R_obs, 1, paste0, collapse = "-"))
 
   for(i in seq_len(nrow(R_obs))) {
