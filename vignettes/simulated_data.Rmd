@@ -9,26 +9,53 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
-K <- 50 # number of columns of Y
-J <- 100 # number of columns of X
-J0 <- 10 # number of columns of X actually contribute
-n <- 200 # number of samples
+```{r, echo = F}
+library("knitr")
+library("gflasso")
+library("ggplot2")
+library("grid")
+opts_chunk$set(cache = TRUE, fig.width = 4, fig.height = 4, fig.align = "center")
 
-B <- matrix(rnorm(J * K), J, K)
-B[sample(J, J0), ] <- 0
-X <- matrix(rnorm(n * J), n, J)
+scale_colour_discrete <- function(...)
+  scale_colour_brewer(..., palette="Set2")
+small_theme <- function(base_size = 7, base_family = "Helvetica") {
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+  theme(axis.title = element_text(size = rel(0.8)),
+        legend.title = element_text(size = rel(0.8)),
+        legend.text = element_text(size = rel(0.8)),
+        plot.title = element_text(size = rel(1.1)),
+        plot.margin = unit(c(0.1, .1, .1, .1), "lines")
+        )
+}
+theme_set(small_theme())
+read_chunk("simulated_data.R")
+```
 
-Y <- X %*% B + matrix(10 * rnorm(n * K), n, K)
-test <- cv.glmnet(x = X, y = Y[, 1])
+Here is a toy example applying the GF-lasso. The data is drawn from an
+actual sparse regression model.
 
-R <- matrix(1, K, K) # tie all the responses together
-res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 1, gamma = 1, iter_max = 5000))
+```{r, simulate-data}
+```
 
-image(B == 0)
-image(res$B == 0)
+This fits a GF-lasso, tying all the responses together (even though in
+the simulation, they are not actually related). There are a few
+parameters involved, but I haven't systematically tuned them.
 
-plot(res$obj)
-plot(res$B, B)
-abline(a = 0, b = 1, col = "red")
+```{r, gflasso}
+```
+
+The objective decreases pretty quickly, and stabilizes.
+
+```{r, vis-objective}
+```
+
+Our estimated $\beta$ is not too far off. Note it shrinks things a
+little.
+
+```{r, coef-hat-pred}
+```
+
+But we haven't really recovered the zero pattern.
+
+```{r, vis-coefs}
 ```
