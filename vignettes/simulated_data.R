@@ -3,6 +3,25 @@
 # R script to accompany simulated_data.Rmd
 ################################################################################
 
+## ---- sparse-sim-packages ----
+# List of packages for session
+.packages = c("gflasso")
+
+# Install CRAN packages (if not already installed)
+.inst <- .packages %in% installed.packages()
+if(any(!.inst)) {
+  install.packages(.packages[!.inst], repos='http://cran.rstudio.com/')
+}
+
+# Load packages into session 
+lapply(.packages, require, character.only=TRUE)
+set.seed(04032016)
+
+cat("\014")  # Clear console
+
+rm(list=ls()) # Delete all existing variables
+graphics.off() # Close all open plots
+
 ## ---- simulate-data ----
 K <- 50 # number of columns of Y
 J <- 100 # number of columns of X
@@ -23,7 +42,7 @@ res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 5, gamma = 5, iter_max
 plot(res$obj)
 
 ## ---- coef-hat-pred ----
-plot(res$B, B, asp = 1)
+plot(B, res$B, asp = 1)
 abline(a = 0, b = 1, col = "red")
 
 ## ---- vis-coefs ----
