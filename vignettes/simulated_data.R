@@ -5,7 +5,9 @@
 
 ## ---- sparse-sim-packages ----
 # List of packages for session
-.packages = c("gflasso")
+.packages = c("gflasso",
+              "reshape2",
+              "ggplot2")
 
 # Install CRAN packages (if not already installed)
 .inst <- .packages %in% installed.packages()
@@ -35,17 +37,34 @@ X <- matrix(rnorm(n * J), n, J)
 Y <- X %*% B + matrix(rnorm(n * K), n, K)
 
 ## ---- gflasso ----
-R <- matrix(1, K, K) # tie all the responses together
-res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 5, gamma = 5, iter_max = 1000, eps = .5))
+R <- matrix(1, K, K)
+R[(K / 2 + 1) : K, 1:(K / 2)] <- 0
+R[1:(K / 2), (K / 2 + 1) : K] <- 0
+res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 10, gamma = 10, iter_max = 400, eps = .5))
 
 ## ---- vis-objective ----
 plot(res$obj)
 
 ## ---- coef-hat-pred ----
-plot(B, res$B, asp = 1)
-abline(a = 0, b = 1, col = "red")
+mB_compare <- melt(list(truth = B, fit = res$B)) %>%
+  dcast(Var1 + Var2 ~ L1)
+mB_compare$group <- ifelse(mB_compare$Var2 <= K / 2, "group_1", "group_2")
+ggplot(mB_compare) +
+  geom_point(aes(x = truth, y = fit, col = group)) +
+  coord_fixed() +
+  geom_abline(slope = 1, intercept = 0, col = 'red') +
+  ggtitle("True vs. Fitted Coefficients")
 
 ## ---- vis-coefs ----
-image(B == 0)
-image(res$B == 0)
-table(B == 0, res$B == 0)
+mres_B <- melt(res$B)
+mres_B$small <- mres_B$value < 5e-4
+
+ggplot(melt(B)) +
+  geom_tile(aes(x = Var2, y = Var1, fill = as.factor(value == 0))) +
+  scale_fill_brewer(palette = "RdBu")
+
+ggplot(mres_B) +
+  geom_tile(aes(x = Var2, y = Var1, fill = small)) +
+  scale_fill_brewer(palette = "RdBu")
+
+table(B == 0, abs(res$B) < 1e-5)

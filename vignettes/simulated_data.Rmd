@@ -14,7 +14,7 @@ library("knitr")
 library("gflasso")
 library("ggplot2")
 library("grid")
-opts_chunk$set(cache = TRUE, fig.width = 4, fig.height = 4, fig.align = "center")
+opts_chunk$set(fig.width = 8, fig.height = 8, fig.align = "center")
 
 scale_colour_discrete <- function(...)
   scale_colour_brewer(..., palette="Set2")
