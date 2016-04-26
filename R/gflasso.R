@@ -60,7 +60,8 @@ gflasso <- function(Y, X, R, opts = list()) {
   Lu <- get_Lu(X, C, opts$lambda, opts$gamma, mu)
 
   accgrad_opts <- list(lambda = opts$lambda, L = Lu, mu = mu,
-                       iter_max = opts$iter_max, delta_conv = opts$delta_conv)
+                       iter_max = opts$iter_max, delta_conv = opts$delta_conv,
+                       verbose = opts$verbose)
   optim_result <- accgrad(X, Y, C, accgrad_opts)
   list(B = optim_result$B, obj = optim_result$obj, Lu = Lu, means = means)
 }

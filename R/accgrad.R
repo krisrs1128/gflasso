@@ -91,8 +91,8 @@ accgrad <- function(X, Y, C, opts) {
   obj <- vector(length = opts$iter_max)
 
   theta <- 1
-  cat("\titer\t|\tobj\t|\t|B(t + 1) - B(t)| \n")
-  for(iter in seq_len(opts$iter_max)) {
+  if (opts$verbose) cat("\titer\t|\tobj\t|\t|B(t + 1) - B(t)| \n")
+  for (iter in seq_len(opts$iter_max)) {
     # make a step
     grad_f <- get_grad_f(X, Y, W, C, opts$mu)
     B_next <- get_B_next(W, grad_f, opts$L, opts$lambda)
@@ -104,10 +104,10 @@ accgrad <- function(X, Y, C, opts) {
     delta <- sum(abs(B_next - B))
     B <- B_next
     obj[iter]  <- objective(X, B, Y, C, opts$lambda)
-    if(iter %% 10 == 0 & opts$verbose) {
+    if (iter %% 10 == 0 & opts$verbose) {
       cat(sprintf("%d \t | %f \t | %f \n", iter, obj[iter], delta))
     }
-    if(delta < opts$delta_conv | iter > opts$iter_max) break
+    if (delta < opts$delta_conv | iter > opts$iter_max) break
     theta <- theta_next
   }
   list(B = B, obj = obj[seq_len(iter)])
