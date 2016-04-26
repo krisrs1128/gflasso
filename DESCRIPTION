@@ -3,9 +3,12 @@ Title: Perform graph structured multitask regression, according to Chen, et. al.
 Version: 0.0.0.9000
 Authors@R: person("Kris", "Sankaran", email = "first.last@example.com", role = c("aut", "cre"))
 Description: This is still an experimental package.
-Depends: R (>= 3.2.1)
+Depends:
+    R (>= 3.2.1)
 License: What license is it under?
 LazyData: true
-Suggests: knitr,
+Suggests:
+    knitr,
     rmarkdown
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
