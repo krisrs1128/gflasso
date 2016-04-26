@@ -106,4 +106,32 @@ ggplot(gflasso_mb) +
   scale_fill_gradient2(midpoint = 0, high = "#90ee90", low = "#000080") +
   theme(panel.grid = element_blank())
 
+## ---- gflasso-reg-bhat ----
+reg_fit_data <- m_y %>%
+  left_join(m_x) %>%
+  left_join(m_b) %>%
+  left_join(gflasso_mb)
+reg_fit_data$zero <- reg_fit_data$beta == 0
+cur_fit_data <- reg_fit_data %>%
+  filter(task %in% 20:30,
+         feature %in% 10:18) %>%
+  melt(measure.vars = c("beta", "beta_hat"), variable.name = "coef")
+
+## ---- vis-reg-fit ----
+ggplot(cur_fit_data) +
+  geom_point(aes(x = x, y = y, col = zero), 
+             size = .3, alpha = 0.05) +
+  geom_abline(data = cur_fit_data,
+              aes(slope = value, intercept = 0, col = zero, linetype = coef),
+              alpha = 0.9) +
+  scale_color_manual(values = c("#8068ab", "#d9bad8")) +
+  facet_grid(feature ~ task) +
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        panel.margin = unit(0, "lines"),
+        strip.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+## ---- class-accuracy ----
 table(B == 0, abs(gflasso_res$B) < 5e-2)
