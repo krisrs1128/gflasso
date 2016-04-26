@@ -104,7 +104,7 @@ accgrad <- function(X, Y, C, opts) {
     delta <- sum(abs(B_next - B))
     B <- B_next
     obj[iter]  <- objective(X, B, Y, C, opts$lambda)
-    if(iter %% 10 == 0) {
+    if(iter %% 10 == 0 & opts$verbose) {
       cat(sprintf("%d \t | %f \t | %f \n", iter, obj[iter], delta))
     }
     if(delta < opts$delta_conv | iter > opts$iter_max) break

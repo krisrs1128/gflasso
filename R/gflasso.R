@@ -12,6 +12,7 @@
 #' $gamma The graph regularization parameter.
 #' $iter_max What is the maximum number of iterations we should run?
 #' $lambda The l1 regularization parameter.
+#' $verbose Should the gradient descent print its progress?
 #' @return A modified version of opts with defaults filled in.
 #' @export
 merge_proxgrad_opts <- function(opts) {
@@ -21,6 +22,7 @@ merge_proxgrad_opts <- function(opts) {
   default_opts$gamma <- 1
   default_opts$iter_max <- 1e3
   default_opts$lambda <- 1
+  default_opts$verbose <- FALSE
   modifyList(default_opts, opts)
 }
 
