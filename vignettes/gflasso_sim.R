@@ -7,6 +7,7 @@
 # List of packages for session
 .packages = c("gflasso",
               "reshape2",
+              "glmnet",
               "ggplot2")
 
 # Install CRAN packages (if not already installed)
@@ -32,7 +33,7 @@ n <- 200 # number of samples
 
 ## ---- gflasso-simulate-data ----
 beta <- rnorm(J)
-B <- beta %*% t(rep(1, K)) + matrix(rnorm(J * K, 0, .5), J, K)
+B <- beta %*% t(rep(1, K)) + matrix(rnorm(J * K, 0, .2), J, K)
 B[-sample(J, J0), 1 : (K / 2)] <- 0
 B[-sample(J, J0), (K / 2 + 1) : K] <- 0
 X <- matrix(rnorm(n * J), n, J)
@@ -96,7 +97,7 @@ ggplot(b_compare) +
   coord_fixed() +
   theme(panel.grid = element_blank())
 
-## ---- vis-coefs ----
+## ---- vis-Bhat-gflasso ----
 gflasso_mb <- melt(gflasso_res$B, varnames = c("feature", "task"),
                value.name = "beta_hat")
 gflasso_mb$small <- gflasso_mb$beta_hat < 5e-2
@@ -135,3 +136,61 @@ ggplot(cur_fit_data) +
 
 ## ---- class-accuracy ----
 table(B == 0, abs(gflasso_res$B) < 5e-2)
+
+## ---- lasso-baseline ----
+b_lasso <- matrix(0, J, K)
+for (k in seq_len(K)) {
+  glmnet_fit <- cv.glmnet(x = X, y = Y[, k], intercept = F)
+  b_lasso[, k] <- coef(glmnet_fit)[-1]
+}
+
+## ---- lasso-bhat-b ----
+b_compare <- melt(list(truth = B, fit = b_lasso)) %>%
+  dcast(Var1 + Var2 ~ L1)
+b_compare$group <- ifelse(b_compare$Var2 <= K / 2, "task_group_1", "task_group_2")
+ggplot(b_compare) +
+  geom_abline(slope = 1, intercept = 0, col = '#696969', alpha = 0.8, size = .3) +
+  geom_vline(xintercept = 0, col = '#696969', alpha = 0.5, size = .05) +
+  geom_hline(yintercept = 0, col = '#696969', alpha = 0.5, size = .05) +
+  geom_point(aes(x = truth, y = fit, col = group), size = .5, alpha = 0.6) +
+  scale_color_manual(values = c("#008080", "#cd5c5c")) +
+  coord_fixed() +
+  theme(panel.grid = element_blank())
+
+## ---- vis-Bhat-lasso ----
+lasso_mb <- melt(b_lasso, varnames = c("feature", "task"),
+               value.name = "beta_hat_lasso")
+
+ggplot(lasso_mb) +
+  geom_tile(aes(x = task, y = feature, fill = beta_hat)) +
+  scale_fill_gradient2(midpoint = 0, high = "#90ee90", low = "#000080") +
+  theme(panel.grid = element_blank())
+
+## ---- lasso-reg-bhat ----
+reg_fit_data <- m_y %>%
+  left_join(m_x) %>%
+  left_join(m_b) %>%
+  left_join(lasso_mb)
+
+reg_fit_data$zero <- reg_fit_data$beta == 0
+cur_fit_data <- reg_fit_data %>%
+  filter(task %in% 20:30,
+         feature %in% 10:18) %>%
+  melt(measure.vars = c("beta", "beta_hat_lasso"), variable.name = "coef")
+
+## ---- vis-reg-fit ----
+ggplot(cur_fit_data) +
+  geom_point(aes(x = x, y = y, col = zero), 
+             size = .3, alpha = 0.05) +
+  geom_abline(data = cur_fit_data,
+              aes(slope = value, intercept = 0, col = zero, linetype = coef),
+              alpha = 0.9) +
+  scale_color_manual(values = c("#8068ab", "#d9bad8")) +
+  facet_grid(feature ~ task) +
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        panel.margin = unit(0, "lines"),
+        strip.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
