@@ -43,7 +43,6 @@ m_b <- melt(B, varnames = c("feature", "task"), value.name = "beta")
 ggplot(m_b) +
   geom_tile(aes(x = task, y = feature, fill = beta)) +
   scale_fill_gradient2(midpoint = 0, high = "#90ee90", low = "#000080") +
-  ggtitle("True Regression Coefficients") +
   theme(panel.grid = element_blank())
 
 ## ---- vis-reg-data ----
@@ -75,27 +74,36 @@ ggplot(cur_data) +
 R <- matrix(1, K, K)
 R[(K / 2 + 1) : K, 1:(K / 2)] <- 0
 R[1:(K / 2), (K / 2 + 1) : K] <- 0
-res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 10, gamma = 10, iter_max = 400, eps = .5))
+gflasso_res <- gflasso(Y, X, R, list(delta_conv = 1e-10, lambda = 8, gamma = 2, iter_max = 1200, eps = .1))
 
 ## ---- vis-objective ----
-plot(res$obj)
+obj_data <- data.frame(iteration = seq_len(1200),
+                       objective = gflasso_res$obj)
+ggplot(obj_data) +
+  geom_line(aes(x = iteration, y = objective)) +
+  theme(panel.grid = element_blank())
 
 ## ---- coef-hat-pred ----
-mB_compare <- melt(list(truth = B, fit = res$B)) %>%
+b_compare <- melt(list(truth = B, fit = gflasso_res$B)) %>%
   dcast(Var1 + Var2 ~ L1)
-mB_compare$group <- ifelse(mB_compare$Var2 <= K / 2, "group_1", "group_2")
-ggplot(mB_compare) +
-  geom_point(aes(x = truth, y = fit, col = group)) +
+b_compare$group <- ifelse(b_compare$Var2 <= K / 2, "task_group_1", "task_group_2")
+ggplot(b_compare) +
+  geom_abline(slope = 1, intercept = 0, col = '#696969', alpha = 0.8, size = .3) +
+  geom_vline(xintercept = 0, col = '#696969', alpha = 0.5, size = .05) +
+  geom_hline(yintercept = 0, col = '#696969', alpha = 0.5, size = .05) +
+  geom_point(aes(x = truth, y = fit, col = group), size = .5, alpha = 0.6) +
+  scale_color_manual(values = c("#008080", "#cd5c5c")) +
   coord_fixed() +
-  geom_abline(slope = 1, intercept = 0, col = 'red') +
-  ggtitle("True vs. Fitted Coefficients")
+  theme(panel.grid = element_blank())
 
 ## ---- vis-coefs ----
-mres_B <- melt(res$B)
-mres_B$small <- mres_B$value < 5e-4
+gflasso_mb <- melt(gflasso_res$B, varnames = c("feature", "task"),
+               value.name = "beta_hat")
+gflasso_mb$small <- gflasso_mb$beta_hat < 5e-2
 
-ggplot(mres_B) +
-  geom_tile(aes(x = Var2, y = Var1, fill = small)) +
-  scale_fill_brewer(palette = "RdBu")
+ggplot(gflasso_mb) +
+  geom_tile(aes(x = task, y = feature, fill = beta_hat)) +
+  scale_fill_gradient2(midpoint = 0, high = "#90ee90", low = "#000080") +
+  theme(panel.grid = element_blank())
 
-table(B == 0, abs(res$B) < 1e-5)
+table(B == 0, abs(gflasso_res$B) < 5e-2)
