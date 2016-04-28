@@ -31,20 +31,6 @@ objective <- function(X, B, Y, C, lambda) {
 
 # gradient-descent-funs --------------------------------------------------------
 
-#' @title Get optimal alpha matrix from the dual norm representation
-#' @param B The J x K regression coefficient estimates.
-#' @param C The L1 penalization matrix, returned by \code{get_C()}.
-#' @param mu The smoothing parameter.
-#' @return The optimal A matrix defined by Lemma 1.
-#' @references Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
-#' @export
-get_alpha_opt <- function(C, W, mu) {
-  alpha <- (1 / mu) * W %*% t(C)
-  alpha[alpha > 1] <- 1
-  alpha[alpha < -1] <- -1
-  alpha
-}
-
 #' @title Calculate the gradient for one step
 #' @param Y The matrix of regression responses.
 #' @param X The data matrix.
@@ -112,4 +98,3 @@ accgrad <- function(X, Y, C, opts) {
   }
   list(B = B, obj = obj[seq_len(iter)])
 }
-

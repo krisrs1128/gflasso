@@ -5,6 +5,8 @@ Authors@R: person("Kris", "Sankaran", email = "first.last@example.com", role = c
 Description: This is still an experimental package.
 Depends:
     R (>= 3.2.1)
+Imports: Rcpp (>= 0.12.1)
+LinkingTo: Rcpp, RcppArmadillo
 License: What license is it under?
 LazyData: true
 Suggests:
