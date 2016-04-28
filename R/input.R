@@ -13,16 +13,14 @@ get_H <- function(R) {
   R[lower.tri(R, diag = TRUE)] <- 0
   R_obs <- which(R != 0, arr.ind = T)
   H <- matrix(0, K, max(nrow(R_obs), 1)) # protect against no-edges case
-  dimnames(H) <- list(1:K, apply(R_obs, 1, paste0, collapse = "-"))
 
   for(i in seq_len(nrow(R_obs))) {
     cur_row <- R_obs[i, 1]
     cur_col <- R_obs[i, 2]
     rij <- R[cur_row, cur_col]
     tau_rij <- abs(rij)
-    cur_h_col <- paste(R_obs[i, ], collapse = "-")
-    H[cur_row, cur_h_col] <- tau_rij
-    H[cur_col, cur_h_col] <- -sign(rij) * tau_rij
+    H[cur_row, i] <- tau_rij
+    H[cur_col, i] <- -sign(rij) * tau_rij
   }
   H
 }
