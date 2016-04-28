@@ -15,7 +15,7 @@
 #' $verbose Should the gradient descent print its progress?
 #' @return A modified version of opts with defaults filled in.
 #' @export
-merge_proxgrad_opts <- function(opts) {
+merge_proxgrad_opts <- function(opts, J, K) {
   default_opts <- list()
   default_opts$delta_conv <- 1e-2
   default_opts$eps <- 0.005
@@ -23,6 +23,7 @@ merge_proxgrad_opts <- function(opts) {
   default_opts$iter_max <- 1e3
   default_opts$lambda <- 1
   default_opts$verbose <- FALSE
+  default_opts$B0 <- matrix(0, J, K)
   modifyList(default_opts, opts)
 }
 
@@ -44,7 +45,7 @@ merge_proxgrad_opts <- function(opts) {
 #' @export
 gflasso <- function(Y, X, R, opts = list()) {
   # get opts
-  opts <- merge_proxgrad_opts(opts)
+  opts <- merge_proxgrad_opts(opts, ncol(X), ncol(Y))
 
   # get L1 penalty matrix
   C <- opts$gamma * t(get_H(R))
@@ -61,7 +62,7 @@ gflasso <- function(Y, X, R, opts = list()) {
 
   accgrad_opts <- list(lambda = opts$lambda, L = Lu, mu = mu,
                        iter_max = opts$iter_max, delta_conv = opts$delta_conv,
-                       verbose = opts$verbose)
+                       verbose = opts$verbose, B0 = opts$B0)
   optim_result <- accgrad(X, Y, C, accgrad_opts)
   list(B = optim_result$B, obj = optim_result$obj, Lu = Lu, means = means)
 }

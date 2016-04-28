@@ -72,8 +72,8 @@ get_B_next <- function(W, grad_f, L, lambda) {
 #' @export
 accgrad <- function(X, Y, C, opts) {
   # initialize results
-  W <- matrix(0, ncol(X), ncol(Y))
-  B <- matrix(0, ncol(X), ncol(Y))
+  B <- opts$B0
+  W <- B
   obj <- vector(length = opts$iter_max)
 
   theta <- 1
