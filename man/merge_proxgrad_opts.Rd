@@ -4,7 +4,7 @@
 \alias{merge_proxgrad_opts}
 \title{Merge default proximal gradient descent options}
 \usage{
-merge_proxgrad_opts(opts)
+merge_proxgrad_opts(opts, J, K)
 }
 \arguments{
 \item{opts}{A potentially partially specified list of regularization and
