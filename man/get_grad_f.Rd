@@ -21,6 +21,9 @@ get_grad_f(X, Y, W, C, mu)
 The gradient descent direction for B, given the current estimates.
 See equation (11) in the reference.
 }
+\description{
+Calculate the gradient for one step
+}
 \references{
 Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }

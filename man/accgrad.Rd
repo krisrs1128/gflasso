@@ -24,4 +24,7 @@ A list containing the following elements \cr
   $B The final estimates of the multitask regression coefficients
   $obj The objective function across gradient descent iterations
 }
+\description{
+Nesterov's Accelerated Gradient Descent
+}
 

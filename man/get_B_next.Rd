@@ -15,4 +15,7 @@ get_B_next(W, grad_f, L, lambda)
 
 \item{lambda}{The l1 regularization parameter.}
 }
+\description{
+Get next value of B in gradient descent
+}
 
