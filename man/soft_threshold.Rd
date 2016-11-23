@@ -11,4 +11,7 @@ soft_threshold(v, lambda)
 
 \item{lambda}{The amount to soft-threshold by}
 }
+\description{
+Standard soft-thresholding operator
+}
 

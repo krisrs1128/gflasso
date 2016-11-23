@@ -19,4 +19,7 @@ objective(X, B, Y, C, lambda)
 The error of the reconstruction according to the original (nonsmooth)
 objective.
 }
+\description{
+Get the objective of the current estimates
+}
 

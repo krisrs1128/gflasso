@@ -5,7 +5,7 @@
 
 # utils ------------------------------------------------------------------------
 
-#' @title Standard soft-thresholding operator
+#' Standard soft-thresholding operator
 #' @param v The vector to soft threshold
 #' @param lambda The amount to soft-threshold by
 #' @export
@@ -17,7 +17,7 @@ soft_threshold <- function(v, lambda) {
   res
 }
 
-#' @title Get the objective of the current estimates
+#' Get the objective of the current estimates
 #' @param X The data matrix.
 #' @param B The J x K regression coefficient estimates.
 #' @param C The L1 penalization matrix, returned by \code{get_C()}.
@@ -31,7 +31,21 @@ objective <- function(X, B, Y, C, lambda) {
 
 # gradient-descent-funs --------------------------------------------------------
 
-#' @title Calculate the gradient for one step
+#' Get Optimal Alpha
+#' S(C * W' / mu) where S projects into the interval [-1, 1].
+#' @param C The L1 penalization matrix, returned by \code{get_C()}.
+#' @param W The W matrix in Algorithm 1 of the reference
+#' @param mu The smoothing parameter.
+#' @return S(C * W' / mu)
+#' @export
+get_alpha_opt <- function(C, W, mu) {
+  alpha <- C %*% t(W) / mu
+  alpha[alpha > 1] <- 1
+  alpha[alpha < -1] <- -1
+  t(alpha)
+}
+
+#' Calculate the gradient for one step
 #' @param Y The matrix of regression responses.
 #' @param X The data matrix.
 #' @param B The J x K regression coefficient estimates.
@@ -46,7 +60,7 @@ get_grad_f <- function(X, Y, W, C, mu) {
   t(X) %*% (X %*% W - Y) + alpha %*% C
 }
 
-#' @title Get next value of B in gradient descent
+#' Get next value of B in gradient descent
 #' @param W The W matrix in Algorithm 1 of the reference
 #' @param grad_f The gradient computed in Algorithm 1
 #' @param L The lipshitz constant, which determines the step size
@@ -57,7 +71,7 @@ get_B_next <- function(W, grad_f, L, lambda) {
   soft_threshold(B_next, lambda / L)
 }
 
-#' @title Nesterov's Accelerated Gradient Descent
+#' Nesterov's Accelerated Gradient Descent
 #' @param X The data matrix.
 #' @param Y The matrix of regression responses.
 #' @param H  The matrix H defined in the reference.
