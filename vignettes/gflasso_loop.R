@@ -33,7 +33,6 @@ graphics.off() # Close all open plots
 theme_set(theme_bw())
 sim_methods_dir <- "~/Documents/programming/simFuns/simMethods/"
 
-
 ## ---- functions ----
 generate_data <- function(X, mu, eta, K, J, J0, n) {
   beta <- rnorm(J, -mu, 1)
@@ -61,19 +60,23 @@ fit_models <- function(X, Y, R, lambda, gamma, eps, n_iter) {
   list(gflasso = gflasso_res$B, lasso = b_lasso)
 }
 
-save_output <- function(b, b_hat, params, output_dir) {
+save_output <- function(Y, b, b_hat, params, output_dir) {
   timestamp <- gsub("[^0-9]", "", Sys.time())
   feather::write_feather(
     data.frame(type = "lasso", k = seq_len(nrow(b)), params, b_hat$lasso),
-    file.path(output_dir, paste0(timestamp, "1.feather"))
+    file.path(output_dir, paste0(timestamp, "_lasso.feather"))
   )
   feather::write_feather(
     data.frame(type = "gflasso", k = seq_len(nrow(b)), params, b_hat$gflasso),
-    file.path(output_dir, paste0(timestamp, "2.feather"))
+    file.path(output_dir, paste0(timestamp, "_gflasso.feather"))
   )
   feather::write_feather(
     data.frame(type = "truth", k = seq_len(nrow(b)), params, b),
-    file.path(output_dir, paste0(timestamp, "3.feather"))
+    file.path(output_dir, paste0(timestamp, "_truth.feather"))
+  )
+  feather::write_feather(
+    data.frame(p = nrow(Y), params, Y),
+    file.path(output_dir, paste0(timestamp, "_Y.feather"))
   )
 }
 
@@ -102,21 +105,31 @@ params <- expand.grid(
   mu = 10 ^ (seq(-3, 3, length.out = 10))
 )
 
+feather::write_feather(data.table(X), path = file.path(output_dir, "X.feather"))
 for (i in seq_len(nrow(params))) {
   cat(sprintf("starting params %d \n", i))
   data <- generate_data(X, params$mu[i], params$eta[i], K, J, J0, n)
   b_hat <- fit_models(X, data$Y, R, lambda, gamma, eps, n_iter)
-  save_output(data$B, b_hat, params[i,, drop = F], output_dir)
+  save_output(data$Y, data$B, b_hat, params[i,, drop = F], output_dir)
 }
 
 ## ---- postprocess_results ----
 files <- list.files(output_dir, full.names = TRUE)
+files <- files[grep("_Y", files, invert = TRUE)]
 results <- list()
+files_mapping <- list()
 for (i in seq_along(files)) {
-  results[[i]] <- data.table(feather::read_feather(files[i]))
+  results[[i]] <- data.table(
+    feather::read_feather(files[i])
+  )
+  files_mapping[[i]] <- data.table(
+    basename(files[i]),
+    results[[i]][1, c("eta", "mu"), with = F]
+  )
 }
 
 results <- rbindlist(results)
+files_mapping <- rbindlist(files_mapping)
 head(results)
 
 mresults <- results %>%
@@ -128,5 +141,9 @@ stats <- mresults %>%
   summarise(
     mae_lasso = mean(abs(lasso - truth)),
     mae_gflasso = mean(abs(gflasso - truth))
-  )
-stats
+  ) %>%
+  left_join(files_mapping)
+
+stats %>%
+  mutate(ratio = mae_gflasso / mae_lasso) %>%
+  arrange(ratio)
