@@ -19,7 +19,7 @@ if(any(!.inst)) {
   install.packages(.packages[!.inst], repos='http://cran.rstudio.com/')
 }
 
-# Load packages into session 
+# Load packages into session
 lapply(.packages, require, character.only=TRUE)
 set.seed(04032016)
 
@@ -37,9 +37,9 @@ J0 <- 5 # number of columns of X actually contribute
 n <- 40 # number of samples
 
 ## ---- gflasso-simulate-data ----
-beta <- rnorm(J, .5, 1)
-beta[sample(J)[1:(J / 2)]] <- rnorm(J / 2, -.5, 1)
-B <- beta %*% t(rep(1, K)) + matrix(rnorm(J * K, 0, .1), J, K)
+beta <- rnorm(J, -0.05, 1)
+beta[sample(J)[1:(J / 2)]] <- rnorm(J / 2, -0.05, 1)
+B <- beta %*% t(rep(1, K)) + matrix(rnorm(J * K, 0, 0.05), J, K)
 B[-sample(J, J0), 1 : (K / 2)] <- 0
 B[-sample(J, J0), (K / 2 + 1) : K] <- 0
 X <- matrix(rnorm(n * J), n, J)
@@ -132,7 +132,7 @@ cur_fit_data <- reg_fit_data %>%
 
 ## ---- vis-reg-fit ----
 ggplot(cur_fit_data) +
-  geom_point(aes(x = x, y = y, col = zero), 
+  geom_point(aes(x = x, y = y, col = zero),
              size = .3, alpha = 0.05) +
   geom_abline(data = cur_fit_data,
               aes(slope = value, intercept = 0, col = zero, linetype = coef),
@@ -192,7 +192,7 @@ cur_fit_data <- reg_fit_data %>%
 
 ## ---- vis-lasso-fit ----
 ggplot(cur_fit_data) +
-  geom_point(aes(x = x, y = y, col = zero), 
+  geom_point(aes(x = x, y = y, col = zero),
              size = .3, alpha = 0.05) +
   geom_abline(data = cur_fit_data,
               aes(slope = value, intercept = 0, col = zero, linetype = coef),
