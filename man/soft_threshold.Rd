@@ -14,4 +14,3 @@ soft_threshold(v, lambda)
 \description{
 Standard soft-thresholding operator
 }
-

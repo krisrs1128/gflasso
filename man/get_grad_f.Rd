@@ -27,4 +27,3 @@ Calculate the gradient for one step
 \references{
 Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }
-

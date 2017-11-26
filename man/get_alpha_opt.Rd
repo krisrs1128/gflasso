@@ -21,4 +21,3 @@ S(C * W' / mu)
 Get Optimal Alpha
 S(C * W' / mu) where S projects into the interval [-1, 1].
 }
-

@@ -22,4 +22,3 @@ objective.
 \description{
 Get the objective of the current estimates
 }
-
