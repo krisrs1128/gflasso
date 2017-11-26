@@ -61,13 +61,13 @@ cv_gflasso <- function(Y, X, R, opts, cvIndex) {
 #' cvIndex <- caret::createFolds(1:nrow(Y))
 #' crossval(X, Y, cor(Y), seq(0, 1, by = 0.1), cvIndex)
 #' @export
-crossval <- function(X, Y, R, cvIndex, params = seq(0,1,by=0.1)) {
+crossval <- function(X, Y, R, cvIndex, additionalOpts, params = seq(0,1,by=0.1)) {
   cvMatrix <- matrix(NA, length(params),length(params))
   dimnames(cvMatrix) <- list(params, params)
   grid <- expand.grid(lambda = params, gamma = params)
 
   for(i in 1:nrow(grid)){
-    cv <- cv_gflasso(X = X, Y = Y, R = R, opts = list(lambda = grid[i,1], gamma = grid[i,2]),
+    cv <- cv_gflasso(X = X, Y = Y, R = R, opts = c(lambda = grid[i,1], gamma = grid[i,2], additionalOpts),
                      cvIndex = cvIndex)
     cvMatrix[as.character(grid[i,1]),as.character(grid[i,2])] <- mean(cv)
     message(paste(round((i/(nrow(grid)))*100, 2), "% completion", collapse = " "))
