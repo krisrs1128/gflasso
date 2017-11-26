@@ -15,4 +15,3 @@ The matrix H defined in the reference.
 \references{
 Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }
-

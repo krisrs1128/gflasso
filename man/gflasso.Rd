@@ -29,4 +29,3 @@ reference.
 \references{
 Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
 }
-

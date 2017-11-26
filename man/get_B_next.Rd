@@ -18,4 +18,3 @@ get_B_next(W, grad_f, L, lambda)
 \description{
 Get next value of B in gradient descent
 }
-

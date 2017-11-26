@@ -27,4 +27,3 @@ A list containing the following elements \cr
 \description{
 Nesterov's Accelerated Gradient Descent
 }
-
