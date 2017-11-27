@@ -61,17 +61,19 @@ cv_gflasso <- function(Y, X, R, opts, cvIndex) {
 #' cvIndex <- caret::createFolds(1:nrow(Y))
 #' crossval(X, Y, cor(Y), seq(0, 1, by = 0.1), cvIndex)
 #' @export
-crossval <- function(X, Y, R, cvIndex, additionalOpts, params = seq(0,1,by=0.1)) {
-  cvMatrix <- matrix(NA, length(params),length(params))
-  dimnames(cvMatrix) <- list(params, params)
-  grid <- expand.grid(lambda = params, gamma = params)
-
-  for(i in 1:nrow(grid)){
-    cv <- cv_gflasso(X = X, Y = Y, R = R, opts = c(lambda = grid[i,1], gamma = grid[i,2], additionalOpts),
-                     cvIndex = cvIndex)
-    cvMatrix[as.character(grid[i,1]),as.character(grid[i,2])] <- mean(cv)
-    message(paste(round((i/(nrow(grid)))*100, 2), "% completion", collapse = " "))
-  }
-
-  cvMatrix
+crossval <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
+                     params = seq(0,1,by=0.1)) {
+      cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)    
+      cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
+      dimnames(cvArray) <- list(params, params, names(cvIndex))
+      grid <- expand.grid(lambda = params, gamma = params)
+      for(i in 1:nrow(grid)){
+            cv <- cv_gflasso(X = X, Y = Y, R = R, opts = list(lambda = grid[i,1], gamma = grid[i,2], additionalOpts),
+                             cvIndex = cvIndex)
+            cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- cv
+            message(paste(round((i/(nrow(grid)))*100, 2), "% completion", collapse = " "))
+            }
+      cvMean <- apply(cvArray, 1:2, mean)
+      cvSE <- apply(cvArray, 1:2, function(x) sd(x) / sqrt(k * times))
+      return(list("mean" = cvMean, "SE" = cvSE))
 }
