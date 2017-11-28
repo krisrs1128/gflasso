@@ -75,5 +75,6 @@ crossval <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
             }
       cvMean <- apply(cvArray, 1:2, mean)
       cvSE <- apply(cvArray, 1:2, function(x) sd(x) / sqrt(k * times))
-      return(list("mean" = cvMean, "SE" = cvSE))
+      optimal <- grid[which.min(cvMean),]
+      return(list("mean" = cvMean, "SE" = cvSE, "optimal" = optimal))
 }
