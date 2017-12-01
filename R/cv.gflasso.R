@@ -33,6 +33,19 @@
 #' @export
 cv.gflasso <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
                      params = seq(0,1,by=0.1), nCores = detectCores()-1) {
+      if(require("parallel")){
+      }else{
+            message("installing parallel")
+            install.packages("parallel")
+            library(parallel)
+      }
+      if(require("caret")){
+      }else{
+            message("installing caret")
+            install.packages("caret")
+            library(caret)
+      }
+      
       cvFUN <- function(Y, X, R, opts, cvIndex) {
             rmse <- lapply(as.list(seq_along(cvIndex)), function(i){
                   mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
