@@ -94,6 +94,7 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 #' Plot Results from Cross Validation
 #'
 #' @importFrom pheatmap pheatmap
+#' @export
 cv_plot_gflasso <- function(cv.gflasso){
   pheatmap(cv.gflasso$mean, cluster_rows = F, cluster_cols = F,
            main = paste("CV mean RMSE\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,

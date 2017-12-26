@@ -2,6 +2,7 @@
 
 export(accgrad)
 export(cv_gflasso)
+export(cv_plot_gflasso)
 export(get_B_next)
 export(get_H)
 export(get_Lu)
