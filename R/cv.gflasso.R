@@ -50,10 +50,10 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   }
 
   cvFUN <- function(Y, X, R, opts, cvIndex) {
-    lapply(seq_along(cvIndex), function(i){
+    sapply(seq_along(cvIndex), function(i){
       mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
       pred <- X[cvIndex[[i]],] %*% mod$B
-      list("B" = mod$B, "err" = err_fun(pred, Y[cvIndex[[i]], ]))
+      err_fun(pred, Y[cvIndex[[i]], ])
     })
   }
 
@@ -69,18 +69,16 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
         cat(sprintf("CV grid %s/%s \n", x, nrow(grid)))
       }
 
-      cv_res <- cvFUN(
+      cvFUN(
         X = X, Y = Y, R = R,
         opts = list(lambda = grid[x, 1], gamma = grid[x, 2], additionalOpts),
         cvIndex = cvIndex
       )
-
-      additionalOpts$B0 <- cv_res[[1]]$B ## use warm starts
-      sapply(cv_res, function(x) x$err)
     },
     mc.cores = nCores
   )
 
+  print(allCV[[1]])
   for(i in 1:nrow(grid)){
     cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- allCV[[i]]
   }
