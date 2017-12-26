@@ -33,35 +33,50 @@
 #' system.time(testCV <- cv.gflasso(X, Y, R, nCores = 2))
 #' cvPlot.gflasso(testCV)
 #' @export
-cv.gflasso <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
-                     params = seq(0,1,by=0.1), nCores = NULL) {
+cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
+                       params = seq(0, 1, by = 0.1), nCores = NULL) {
 
+  additionalOpts <- merge_proxgrad_opts(additionalOpts, ncol(X), ncol(Y))
   if (is.null(nCores)) {
     nCores <- detectCores() - 1
   }
 
-      cvFUN <- function(Y, X, R, opts, cvIndex) {
-            rmse <- lapply(as.list(seq_along(cvIndex)), function(i){
-                  mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
-                  pred <- X[cvIndex[[i]],] %*% mod$B
-                  return(sqrt(mean((pred - Y[cvIndex[[i]],])**2)))
-            })
-            return(unlist(rmse))
-      }
-      cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)
-      cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
-      dimnames(cvArray) <- list(params, params, names(cvIndex))
-      grid <- expand.grid(lambda = params, gamma = params)
-      allCV <- mclapply(as.list(1:nrow(grid)), function(x){
-            cv <- cvFUN(X = X, Y = Y, R = R, opts = list(lambda = grid[x,1], gamma = grid[x,2], additionalOpts),
-                             cvIndex = cvIndex)
-      }, mc.cores = nCores)
-      for(i in 1:nrow(grid)){
-            cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- allCV[[i]]
-      }
-      cvMean <- apply(cvArray, 1:2, mean)
-      cvSE <- apply(cvArray, 1:2, function(x) sd(x) / sqrt(k * times))
-      optimal <- grid[which.min(cvMean),]
+  cvFUN <- function(Y, X, R, opts, cvIndex) {
+    rmse <- lapply(as.list(seq_along(cvIndex)), function(i){
+      mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
+      pred <- X[cvIndex[[i]],] %*% mod$B
+      sqrt(mean((pred - Y[cvIndex[[i]],]) ** 2))
+    })
+    unlist(rmse)
+  }
 
-      return(list("mean" = cvMean, "SE" = cvSE, "optimal" = optimal))
+  cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)
+  cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
+  dimnames(cvArray) <- list(params, params, names(cvIndex))
+  grid <- expand.grid(lambda = params, gamma = params)
+  allCV <- mclapply(
+    as.list(1:nrow(grid)),
+    function(x) {
+      if (additionalOpts$verbose && x %% 10 == 0) {
+        cat(sprintf("CV grid %s/%s \n", x, nrow(grid)))
+      }
+
+      cvFUN(
+        X = X, Y = Y, R = R,
+        opts = list(lambda = grid[x, 1], gamma = grid[x, 2], additionalOpts),
+        cvIndex = cvIndex
+      )
+    },
+    mc.cores = nCores
+  )
+
+  for(i in 1:nrow(grid)){
+    cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- allCV[[i]]
+  }
+
+  cvMean <- apply(cvArray, 1:2, mean)
+  cvSE <- apply(cvArray, 1:2, function(x) sd(x) / sqrt(k * times))
+  optimal <- grid[which.min(cvMean),]
+
+  list("mean" = cvMean, "SE" = cvSE, "optimal" = optimal)
 }
