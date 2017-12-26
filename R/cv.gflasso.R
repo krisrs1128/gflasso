@@ -42,17 +42,17 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   }
 
   cvFUN <- function(Y, X, R, opts, cvIndex) {
-    rmse <- lapply(as.list(seq_along(cvIndex)), function(i){
+    sapply(as.list(seq_along(cvIndex)), function(i){
       mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
       pred <- X[cvIndex[[i]],] %*% mod$B
       sqrt(mean((pred - Y[cvIndex[[i]],]) ** 2))
     })
-    unlist(rmse)
   }
 
   cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)
   cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
   dimnames(cvArray) <- list(params, params, names(cvIndex))
+
   grid <- expand.grid(lambda = params, gamma = params)
   allCV <- mclapply(
     as.list(1:nrow(grid)),
@@ -74,9 +74,9 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
     cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- allCV[[i]]
   }
 
-  cvMean <- apply(cvArray, 1:2, mean)
-  cvSE <- apply(cvArray, 1:2, function(x) sd(x) / sqrt(k * times))
-  optimal <- grid[which.min(cvMean),]
-
-  list("mean" = cvMean, "SE" = cvSE, "optimal" = optimal)
+  list(
+    "mean" = apply(cvArray, 1:2, mean),
+    "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
+    "optimal" = grid[which.min(cvMean), ]
+  )
 }
