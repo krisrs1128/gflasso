@@ -9,6 +9,11 @@
 ## sankaran.kris@gmail.com
 ## date: 12/26/2017
 
+#' Compute the root mean squared error
+rmse <- function(pred, y) {
+  sqrt(mean( (pred - y) ^ 2 ))
+}
+
 #' Cross Validation for GFLasso
 #'
 #' @param Y The matrix of regression responses.
@@ -19,6 +24,8 @@
 #' @param times Number of repetitions (Note: Total number of RMSE estimates = k x times)
 #' @param params The grid of lambda and gamma values to try
 #' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
+#' @param err_fun A function that computes the error between vectors of
+#'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
 #'   (column) values.
 #' @importFrom parallel mclapply
@@ -34,7 +41,8 @@
 #' cvPlot.gflasso(testCV)
 #' @export
 cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
-                       params = seq(0, 1, by = 0.1), nCores = NULL) {
+                       params = seq(0, 1, by = 0.1), nCores = NULL,
+                       err_fun = rmse) {
 
   additionalOpts <- merge_proxgrad_opts(additionalOpts, ncol(X), ncol(Y))
   if (is.null(nCores)) {
@@ -45,7 +53,7 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
     sapply(as.list(seq_along(cvIndex)), function(i){
       mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
       pred <- X[cvIndex[[i]],] %*% mod$B
-      sqrt(mean((pred - Y[cvIndex[[i]],]) ** 2))
+      err_fun(pred, Y[cvIndex[[i]], ])
     })
   }
 
@@ -74,8 +82,9 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
     cvArray[as.character(grid[i,1]),as.character(grid[i,2]),] <- allCV[[i]]
   }
 
+  cvMean <- apply(cvArray, 1:2, mean)
   list(
-    "mean" = apply(cvArray, 1:2, mean),
+    "mean" = cvMean,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
     "optimal" = grid[which.min(cvMean), ]
   )
