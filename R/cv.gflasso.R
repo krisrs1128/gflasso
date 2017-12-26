@@ -7,7 +7,7 @@
 ##
 ## author: Francisco Lima (https://github.com/monogenea), with revisions by
 ## sankaran.kris@gmail.com
-## date: 11/26/2017
+## date: 12/26/2017
 
 #' Cross Validation for GFLasso
 #'
@@ -21,6 +21,8 @@
 #' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
 #'   (column) values.
+#' @importFrom parallel mclapply
+#' @importFrom caret createMultiFolds
 #' @examples
 #' X <- matrix(rnorm(100 * 10), 100, 10)
 #' u <- matrix(rnorm(10), 10, 1)
@@ -32,20 +34,12 @@
 #' cvPlot.gflasso(testCV)
 #' @export
 cv.gflasso <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
-                     params = seq(0,1,by=0.1), nCores = detectCores()-1) {
-      if(require("parallel")){
-      }else{
-            message("installing parallel")
-            install.packages("parallel")
-            library(parallel)
-      }
-      if(require("caret")){
-      }else{
-            message("installing caret")
-            install.packages("caret")
-            library(caret)
-      }
-      
+                     params = seq(0,1,by=0.1), nCores = NULL) {
+
+  if (is.null(nCores)) {
+    nCores <- detectCores() - 1
+  }
+
       cvFUN <- function(Y, X, R, opts, cvIndex) {
             rmse <- lapply(as.list(seq_along(cvIndex)), function(i){
                   mod <- gflasso(Y = Y[-cvIndex[[i]],], X = X[-cvIndex[[i]],], R = R, opts = opts)
@@ -54,7 +48,7 @@ cv.gflasso <- function(X, Y, R, additionalOpts = NULL, k = 5, times = 1,
             })
             return(unlist(rmse))
       }
-      cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)    
+      cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)
       cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
       dimnames(cvArray) <- list(params, params, names(cvIndex))
       grid <- expand.grid(lambda = params, gamma = params)
