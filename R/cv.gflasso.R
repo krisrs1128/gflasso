@@ -36,11 +36,11 @@ rmse <- function(pred, y) {
 #' B <- u %*% t(u) + matrix(rnorm(10 * 10, 0, 0.1), 10, 10)
 #' Y <- X %*% B + matrix(rnorm(100 * 10), 100, 10)
 #' R <- ifelse(cor(Y) > .8, 1, 0)
-#' system.time(testCV <- cv.gflasso(X, Y, R, nCores = 1))
-#' system.time(testCV <- cv.gflasso(X, Y, R, nCores = 2))
-#' cvPlot.gflasso(testCV)
+#' system.time(testCV <- cv_gflasso(X, Y, R, nCores = 1))
+#' system.time(testCV <- cv_gflasso(X, Y, R, nCores = 2))
+#' cv_plot_gflasso(testCV)
 #' @export
-cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
+cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
                        params = seq(0, 1, by = 0.1), nCores = NULL,
                        err_fun = rmse) {
 
@@ -89,4 +89,13 @@ cv.gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
     "optimal" = grid[which.min(cvMean), ]
   )
+}
+
+#' Plot Results from Cross Validation
+#'
+#' @importFrom pheatmap pheatmap
+cv_plot_gflasso <- function(cv.gflasso){
+  pheatmap(cv.gflasso$mean, cluster_rows = F, cluster_cols = F,
+           main = paste("CV mean RMSE\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,
+                        ",", "gamma =", cv.gflasso$optimal$gamma))
 }
