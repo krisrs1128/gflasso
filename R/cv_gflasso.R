@@ -87,7 +87,8 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   list(
     "mean" = cvMean,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
-    "optimal" = grid[which.min(cvMean), ]
+    "optimal" = grid[which.min(cvMean), ],
+    "err_fun" = quote(err_fun)
   )
 }
 
@@ -97,6 +98,6 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 #' @export
 cv_plot_gflasso <- function(cv.gflasso){
   pheatmap(cv.gflasso$mean, cluster_rows = F, cluster_cols = F,
-           main = paste("CV mean RMSE\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,
+           main = paste("CV mean", cv.gflasso$err_fun, "\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,
                         ",", "gamma =", cv.gflasso$optimal$gamma))
 }
