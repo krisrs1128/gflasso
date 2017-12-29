@@ -88,7 +88,7 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
     "mean" = cvMean,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
     "optimal" = grid[which.min(cvMean), ],
-    "err_fun" = quote(err_fun)
+    "err_fun" = as.character(substitute(err_fun))
   )
 }
 
