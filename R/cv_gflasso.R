@@ -28,7 +28,8 @@ rmse <- function(pred, y) {
 #'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
 #'   (column) values.
-#' @importFrom parallel mclapply detectCores
+#' @importFrom parallel mclapply
+#' @importFrom parallel detectCores
 #' @importFrom caret createMultiFolds
 #' @examples
 #' X <- matrix(rnorm(100 * 10), 100, 10)
