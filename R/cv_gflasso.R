@@ -42,7 +42,7 @@ rmse <- function(pred, y) {
 #' @export
 cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
                        params = seq(0, 1, by = 0.1), nCores = NULL,
-                       err_fun = rmse) {
+                       err_fun = rmse, err_opt = 'min') {
 
   additionalOpts <- merge_proxgrad_opts(additionalOpts, ncol(X), ncol(Y))
   if (is.null(nCores)) {
@@ -84,10 +84,15 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   }
 
   cvMean <- apply(cvArray, 1:2, mean)
+  if(err_opt == 'min'){
+    opt <- grid[which.min(cvMean), ]
+  }else if(err_opt == 'max'){
+    opt <- grid[which.max(cvMean), ]
+  }
   list(
     "mean" = cvMean,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
-    "optimal" = grid[which.min(cvMean), ],
+    "optimal" = opt,
     "err_fun" = as.character(substitute(err_fun))
   )
 }
