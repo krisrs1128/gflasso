@@ -5,7 +5,8 @@
 \title{Cross Validation for GFLasso}
 \usage{
 cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
-  params = seq(0, 1, by = 0.1), nCores = NULL, err_fun = rmse)
+  params = seq(0, 1, by = 0.1), nCores = NULL, err_fun = rmse,
+  err_opt = "min")
 }
 \arguments{
 \item{X}{The data matrix.}
@@ -18,14 +19,17 @@ cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 
 \item{k}{Number of folds}
 
-\item{times}{Number of repetitions (Note: Total number of RMSE estimates = k x times)}
+\item{times}{Number of repetitions (Note: Total number of metric estimates = k x times)}
 
 \item{params}{The grid of lambda and gamma values to try}
 
 \item{nCores}{The number of CPU cores to be used, >1 represents parallelized executions}
 
-\item{err_fun}{A function that computes the error between vectors of
+\item{err_fun}{A function that computes the metric (error/goodness-of-fit) between vectors of
 predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).}
+
+\item{err_opt}{Specify whether do minimize ('min') or maximize ('max') `err_fun`.
+Default is 'min'.}
 }
 \value{
 cvMatrix A matrix of errors across a grid of lambda (row) and gamma
