@@ -1,7 +1,9 @@
 Package: gflasso
-Title: Perform graph structured multitask regression, according to Chen, et. al.
+Title: Perform graph structured multitask regression, according to Chen, et al.
 Version: 0.0.0.9000
-Authors@R: person("Kris", "Sankaran", email = "first.last@example.com", role = c("aut", "cre"))
+Authors@R: c(
+      person("Kris", "Sankaran", email = "sankaran.kris@gmail.com", role = c("aut", "cre")),
+      person("Francisco", "de Abreu e Lima", email = "francisco.lima278@gmail.com", role = "aut"))
 Description: This is still an experimental package.
 Depends:
     R (>= 3.2.1)
