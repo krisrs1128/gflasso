@@ -13,7 +13,6 @@
 rmse <- function(pred, y) {
   sqrt(mean( (pred - y) ^ 2 ))
 }
-
 #' Cross Validation for GFLasso
 #'
 #' @param Y The matrix of regression responses.
@@ -21,14 +20,16 @@ rmse <- function(pred, y) {
 #' @param R The matrix of (thresholded) correlations between columns of Y
 #' @param additionalOpts Additional options to pass alongside lambda and gamma (cf. gflasso)
 #' @param k Number of folds
-#' @param times Number of repetitions (Note: Total number of RMSE estimates = k x times)
+#' @param times Number of repetitions (Note: Total number of metric estimates = k x times)
 #' @param params The grid of lambda and gamma values to try
 #' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
-#' @param err_fun A function that computes the error between vectors of
+#' @param err_fun A function that computes the metric (error/goodness-of-fit) between vectors of
 #'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
+#' @param err_opt Specify whether do minimize ('min') or maximize ('max') `err_fun`.
+#'   Default is 'min'.
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
 #'   (column) values.
-#' @importFrom parallel mclapply
+#' @importFrom parallel mclapply detectCores
 #' @importFrom caret createMultiFolds
 #' @examples
 #' X <- matrix(rnorm(100 * 10), 100, 10)
@@ -42,7 +43,7 @@ rmse <- function(pred, y) {
 #' @export
 cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
                        params = seq(0, 1, by = 0.1), nCores = NULL,
-                       err_fun = rmse) {
+                       err_fun = rmse, err_opt = 'min') {
 
   additionalOpts <- merge_proxgrad_opts(additionalOpts, ncol(X), ncol(Y))
   if (is.null(nCores)) {
@@ -84,10 +85,16 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   }
 
   cvMean <- apply(cvArray, 1:2, mean)
+  if(err_opt == 'min'){
+    opt <- grid[which.min(cvMean), ]
+  }else if(err_opt == 'max'){
+    opt <- grid[which.max(cvMean), ]
+  }
   list(
     "mean" = cvMean,
     "SE" = apply(cvArray, 1:2, sd) / sqrt(k * times),
-    "optimal" = grid[which.min(cvMean), ]
+    "optimal" = opt,
+    "err_fun" = as.character(substitute(err_fun))
   )
 }
 
@@ -97,6 +104,6 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 #' @export
 cv_plot_gflasso <- function(cv.gflasso){
   pheatmap(cv.gflasso$mean, cluster_rows = F, cluster_cols = F,
-           main = paste("CV mean RMSE\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,
+           main = paste("CV mean", cv.gflasso$err_fun, "\nOptimal pars:", "lambda =", cv.gflasso$optimal$lambda,
                         ",", "gamma =", cv.gflasso$optimal$gamma))
 }
