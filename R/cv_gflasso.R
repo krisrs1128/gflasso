@@ -23,6 +23,7 @@ rmse <- function(pred, y) {
 #' @param times Number of repetitions (Note: Total number of metric estimates = k x times)
 #' @param params The grid of lambda and gamma values to try
 #' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
+#' @param seed Arbitrary number to ensure reproducibility. Defaults to 100.
 #' @param err_fun A function that computes the metric (error/goodness-of-fit) between vectors of
 #'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
 #' @param err_opt Specify whether do minimize ('min') or maximize ('max') `err_fun`.
