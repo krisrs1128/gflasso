@@ -65,7 +65,7 @@ You can easily run the simulation outlined in the help page for the CV function 
 
 **Note** that user-provided error functions also work!
 
-Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y`, which is currently automated. 
+Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y` - mean-centering in currently implemented in `gflasso` and we do advise to scale `X` and `Y` beforehand. 
 
 In the following example you will not need it, since you will draw random samples from a standard normal distribution. You can try deriving the fusion penalty from an unweighted correlation network, with a cutoff of $r > 0.8$:
 
@@ -99,7 +99,7 @@ R2 <- function(pred, y){
 # X, u, B and Y are still in memory
 R <- cor(Y)**2
 
-# Change nCores, if you have more than 2, re-run CV
+# Change nCores if you have more than 2, re-run CV
 testCV <- cv_gflasso(X, Y, R, nCores = 2, err_fun = R2, err_opt = "max")
 cv_plot_gflasso(testCV)
 ```
@@ -140,7 +140,7 @@ The figure above points to the interdependencies among the neuroimaging features
 **Note** that in the example below, the convergence tolerance and the maximum number of iterations are specified. Feel free to try different values on your own!
 
 ```{r}
-system.time(CV <- cv_gflasso(X = SNP, Y = BM, R = DS, nCores = 2,
+system.time(CV <- cv_gflasso(X = scale(SNP), Y = scale(BM), R = DS, nCores = 2,
                  additionalOpts = list(delta_conv = 1e-5, iter_max = 1e5)))
 cv_plot_gflasso(CV)
 ```
@@ -148,7 +148,7 @@ cv_plot_gflasso(CV)
 By challenging the GFLASSO with pure LASSO models ($\gamma = 0$, first column), a pure fusion least squares ($\lambda = 0$, first row) and OLS ($\gamma = 0$ and $\lambda = 0$, top-left cell), we can conclude the present example is best modeled with non-zero penalty weights and consequently, with the full GFLASSO. Take the optimal CV parameters ($\lambda = 0.7$ and $\gamma = 1$) to build a GFLASSO model and interpret the resulting coefficient matrix:
 
 ```{r}
-gfMod <- gflasso(X = SNP, Y = BM, R = DS, opts = list(lambda = CV$optimal$lambda,
+gfMod <- gflasso(X = scale(SNP), Y = scale(BM), R = DS, opts = list(lambda = CV$optimal$lambda,
                                                                     gamma = CV$optimal$gamma,
                                                                     delta_conv = 1e-5,
                                                                     iter_max = 1e5))
