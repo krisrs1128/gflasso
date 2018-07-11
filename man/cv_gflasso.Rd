@@ -5,8 +5,8 @@
 \title{Cross Validation for GFLasso}
 \usage{
 cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
-  params = seq(0, 1, by = 0.1), nCores = NULL, err_fun = rmse,
-  err_opt = "min")
+  params = seq(0, 1, by = 0.1), nCores = NULL, seed = 100,
+  err_fun = rmse, err_opt = "min")
 }
 \arguments{
 \item{X}{The data matrix.}
@@ -24,6 +24,8 @@ cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 \item{params}{The grid of lambda and gamma values to try}
 
 \item{nCores}{The number of CPU cores to be used, >1 represents parallelized executions}
+
+\item{seed}{Arbitrary number to ensure reproducibility. Defaults to 100.}
 
 \item{err_fun}{A function that computes the metric (error/goodness-of-fit) between vectors of
 predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).}

@@ -23,6 +23,7 @@ rmse <- function(pred, y) {
 #' @param times Number of repetitions (Note: Total number of metric estimates = k x times)
 #' @param params The grid of lambda and gamma values to try
 #' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
+#' @param seed Arbitrary number to ensure reproducibility. Defaults to 100.
 #' @param err_fun A function that computes the metric (error/goodness-of-fit) between vectors of
 #'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
 #' @param err_opt Specify whether do minimize ('min') or maximize ('max') `err_fun`.
@@ -30,6 +31,7 @@ rmse <- function(pred, y) {
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
 #'   (column) values.
 #' @importFrom parallel mclapply detectCores
+#' @importFrom pbapply pblapply
 #' @importFrom caret createMultiFolds
 #' @examples
 #' X <- matrix(rnorm(100 * 10), 100, 10)
@@ -42,7 +44,7 @@ rmse <- function(pred, y) {
 #' cv_plot_gflasso(testCV)
 #' @export
 cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
-                       params = seq(0, 1, by = 0.1), nCores = NULL,
+                       params = seq(0, 1, by = 0.1), nCores = NULL, seed = 100,
                        err_fun = rmse, err_opt = 'min') {
 
   additionalOpts <- merge_proxgrad_opts(additionalOpts, ncol(X), ncol(Y))
@@ -57,13 +59,13 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
       err_fun(pred, Y[cvIndex[[i]], ])
     })
   }
-
+  set.seed(seed)
   cvIndex <- caret::createMultiFolds(1:nrow(Y), k = k, times = times)
   cvArray <- array(NA, dim = c(rep(length(params), 2), k * times))
   dimnames(cvArray) <- list(params, params, names(cvIndex))
 
   grid <- expand.grid(lambda = params, gamma = params)
-  allCV <- mclapply(
+  allCV <- pbapply::pblapply(
     as.list(1:nrow(grid)),
     function(x) {
       if (additionalOpts$verbose && x %% 10 == 0) {
@@ -76,7 +78,7 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
         cvIndex = cvIndex
       )
     },
-    mc.cores = nCores
+    cl = nCores
   )
 
   print(allCV[[1]])
