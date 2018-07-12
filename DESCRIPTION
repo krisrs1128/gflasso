@@ -14,5 +14,8 @@ LazyData: true
 Suggests:
     knitr,
     rmarkdown
+    bgsmtr,
+    corrplot,
+    pheatmap
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
