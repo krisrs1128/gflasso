@@ -61,7 +61,7 @@ gflasso <- function(Y, X, R, opts = list()) {
 }
 
 
-#' @title GFLASSO prediction
+#' @title GFLasso prediction
 #'
 #' @param model The model object from `gflasso`.
 #' @param new.data The data from which to predict.

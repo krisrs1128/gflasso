@@ -13,19 +13,19 @@
 rmse <- function(pred, y) {
   sqrt(mean( (pred - y) ^ 2 ))
 }
-#' Cross Validation for GFLasso
+#' k-fold Cross Validation for GFLasso
 #'
-#' @param Y The matrix of regression responses.
-#' @param X The data matrix.
-#' @param R The matrix of (thresholded) correlations between columns of Y
-#' @param additionalOpts Additional options to pass alongside lambda and gamma (cf. gflasso)
-#' @param k Number of folds
-#' @param times Number of repetitions (Note: Total number of metric estimates = k x times)
-#' @param params The grid of lambda and gamma values to try
-#' @param nCores The number of CPU cores to be used, >1 represents parallelized executions
+#' @param Y The matrix of regression responses, scaled and centered as necessary.
+#' @param X The data matrix, scaled and centered as necessary.
+#' @param R The matrix of (thresholded) correlations between columns of Y.
+#' @param additionalOpts Additional options to pass alongside lambda and gamma. See merge_proxgrad_opts().
+#' @param k Number of folds.
+#' @param times Number of repetitions. Total number of metric estimates = no. folds x no. times.
+#' @param params The grid of lambda and gamma values to cross-validate.
+#' @param nCores The number of CPU cores to be used.
 #' @param seed Arbitrary number to ensure reproducibility. Defaults to 100.
 #' @param err_fun A function that computes the metric (error/goodness-of-fit) between vectors of
-#'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).
+#'   predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean((pred - y) ^ 2)).
 #' @param err_opt Specify whether do minimize ('min') or maximize ('max') `err_fun`.
 #'   Default is 'min'.
 #' @return cvMatrix A matrix of errors across a grid of lambda (row) and gamma
