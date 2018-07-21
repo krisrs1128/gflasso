@@ -1,10 +1,12 @@
 ---
 title: "Introduction to the GFLASSO"
-author: "Francisco de Abreu e Lima, Kris Sankaran"
-date: "`r Sys.Date()`"
+author:
+      - Francisco de Abreu e Lima
+      - Kris Sankaran
+date: "2018-07-11"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Introduction to the GFLASSO}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,10 +16,10 @@ This document is a revision from a GFLASSO tutorial authored by Francisco de Abr
 While the field of machine learning advances swiftly with the development of increasingly more sophisticated techniques, little attention has been given to high-dimensional multi-task problems that require the simultaneous prediction of multiple responses. This tutorial will show you the power of the Graph-Guided Fused LASSO (GFLASSO) in predicting multiple responses under a single regularized linear regression framework.
 
 # Introduction
+
 In supervised learning, one usually aims at predicting a dependent variable (*i.e.* response) from a set of explanatory variables (*i.e.* predictors) over a set of samples (*i.e.* observations). Regularization methods introduce penalties that prevent overfitting of high-dimensional data, particularly when the number of predictors exceeds the number of observations. These penalties are added to the objective function so that the coefficient estimates of uninformative predictors (that contribute little to the minimization of the error) are minimized themselves. The least absolute shrinkage and selection operator (LASSO) [1] is one such method.
 
 ## What is the LASSO?
-
 Compared to a ordinary least squares (OLS), the LASSO is capable of shrinking coefficient estimates ($\beta$) to exactly zero, thereby ruling out uninformative predictors and performing feature selection, via
 
 $$argmin_\beta \sum_n(y_n-\hat{y_n})^2+\lambda\sum_{j}|\beta_{j}|$$
@@ -45,7 +47,7 @@ To sum up, to fit a GFLASSO model you will need a predictor matrix **X**, a resp
 
 The `gflasso` package offers reproducible n-fold cross-validation with multi-threading borrowed from the `doParallel` package, as well as visualization tools. To run GFLASSO in R you will need to install `devtools`, load it and install the `gflasso` package from the GitHub repository. The demonstration will be conducted on a dataset contained in the package `bgsmtr`. We also recommend installing `corrplot` and `pheatmap` to visualize the results.
 
-``` {r message = FALSE}
+``` {r load, message = FALSE}
 # Install the packages if necessary:
 # install.packages("devtools")
 # install.packages("bgsmtr")
@@ -55,21 +57,20 @@ library(devtools)
 library(bgsmtr)
 library(corrplot)
 library(pheatmap)
-# install_github("monogenea/gflasso")
 library(gflasso)
 ```
 
 # Simulation
 
-You can easily run the simulation outlined in the help page for the CV function `cv_gflasso()`. By default, the CV computes the root mean squared error (RMSE) across a single repetition of a 5-fold CV, over all possible pairs between $\lambda \in \{0,0.1,0.2,...,0.9,1\}$ and $\gamma \in \{0,0.1,0.2,...,0.9,1\}$, the tuning grid. 
+You can easily run the simulation outlined in the help page for the CV function `cv_gflasso`. By default, the CV computes the root mean squared error (RMSE) across a single repetition of a 5-fold CV, over all possible pairs between $\lambda \in \{0,0.1,0.2,...,0.9,1\}$ and $\gamma \in \{0,0.1,0.2,...,0.9,1\}$, the tuning grid. 
 
 **Note** that user-provided error functions also work!
 
-Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y`, which is currently automated. 
+Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y` - mean-centering in currently implemented in `gflasso` and we do advise to consider scaling `X` and `Y` beforehand. 
 
 In the following example you will not need it, since you will draw random samples from a standard normal distribution. You can try deriving the fusion penalty from an unweighted correlation network, with a cutoff of $r > 0.8$:
 
-``` {r}
+``` {r simulation, fig.width = 5, fig.height = 5, fig.align = "center"}
 ?cv_gflasso
 set.seed(100)
 X <- matrix(rnorm(100 * 10), 100, 10)
@@ -86,11 +87,11 @@ The optimal values of $\lambda$ (rows) and $\gamma$ (columns) that minimize the 
 
 **Tip**: Try re-running this example with a different metric, the coefficient of determination ($R^2$). One key advantage of using $R^2$ is that it ranges from 0 to 1. 
 
-Keep in mind that when you provide a custom goodness-of-fit function `err_fun()`, you have to define whether to maximize or minimize the resulting metric using the argument `err_opt`. 
+Keep in mind that when you provide a custom goodness-of-fit function `err_fun`, you have to define whether to maximize or minimize the resulting metric using the argument `err_opt`. 
 
 The following example aims at maximizing $R^2$, using a weighted association network with squared correlation coefficients (*i.e.* $f(r_{ml}) = r_{ml}^2$). If you have more than 2 cores, you might as well change the `nCores` argument and give it a boost!
 
-``` {r}
+``` {r simulation2, fig.width = 5, fig.height = 5, fig.align = "center"}
 # Write R2 function
 R2 <- function(pred, y){
       cor(as.vector(pred), as.vector(y))**2
@@ -99,7 +100,7 @@ R2 <- function(pred, y){
 # X, u, B and Y are still in memory
 R <- cor(Y)**2
 
-# Change nCores, if you have more than 2, re-run CV
+# Change nCores if you have more than 2, re-run CV
 testCV <- cv_gflasso(X, Y, R, nCores = 2, err_fun = R2, err_opt = "max")
 cv_plot_gflasso(testCV)
 ```
@@ -120,7 +121,7 @@ Your task is to predict the morphological, neuroimaging measures from the SNP da
 
 Let's start by organizing the data and exploring the inter-dependencies among all neuroimaging features:
 
-```{r}
+```{r neuroimaging, fig.width = 5, fig.height = 5, fig.align = "center"}
 data(bgsmtr_example_data)
 str(bgsmtr_example_data)
 
@@ -139,16 +140,16 @@ The figure above points to the interdependencies among the neuroimaging features
 
 **Note** that in the example below, the convergence tolerance and the maximum number of iterations are specified. Feel free to try different values on your own!
 
-```{r}
-system.time(CV <- cv_gflasso(X = SNP, Y = BM, R = DS, nCores = 2,
+```{r neuroimaging2, fig.width = 5, fig.height = 5, fig.align = "center"}
+system.time(CV <- cv_gflasso(X = scale(SNP), Y = scale(BM), R = DS, nCores = 2,
                  additionalOpts = list(delta_conv = 1e-5, iter_max = 1e5)))
 cv_plot_gflasso(CV)
 ```
 
 By challenging the GFLASSO with pure LASSO models ($\gamma = 0$, first column), a pure fusion least squares ($\lambda = 0$, first row) and OLS ($\gamma = 0$ and $\lambda = 0$, top-left cell), we can conclude the present example is best modeled with non-zero penalty weights and consequently, with the full GFLASSO. Take the optimal CV parameters ($\lambda = 0.7$ and $\gamma = 1$) to build a GFLASSO model and interpret the resulting coefficient matrix:
 
-```{r}
-gfMod <- gflasso(X = SNP, Y = BM, R = DS, opts = list(lambda = CV$optimal$lambda,
+```{r finalMod, fig.width = 9, fig.height = 8, fig.align = "center"}
+gfMod <- gflasso(X = scale(SNP), Y = scale(BM), R = DS, opts = list(lambda = CV$optimal$lambda,
                                                                     gamma = CV$optimal$gamma,
                                                                     delta_conv = 1e-5,
                                                                     iter_max = 1e5))
@@ -158,7 +159,7 @@ pheatmap(gfMod$B, annotation_row = data.frame("Gene" = bgsmtr_example_data$SNP_g
          show_rownames = F)
 ```
 
-The figure above depicts a very large proportion of coefficients with zero or near-zero values. Although there is no obvious clustering of SNPs with respect to the genes (see row-wise annotation, note the legend is incomplete), there are clear associations between certains SNPs and traits. 
+The figure above depicts a very large proportion of coefficients with zero or near-zero values. Although there is no obvious clustering of SNPs with respect to the genes (see row-wise annotation), there are clear associations between certains SNPs and traits. 
 
 In order to ascertain the existence of a non-random predictive mechanism, you could next repeat the procedure after permutation of the values in either $X$ or $Y$. Experimental work could help elucidate causality and mechanisms from selected SNPs. For example, SNPs that affect protein sequence and structure, disrupting the clearance of the $\beta$-Amyloid plaques that underlie Alzheimer's disease. 
 
@@ -167,7 +168,6 @@ In order to ascertain the existence of a non-random predictive mechanism, you co
 The GFLASSO employs both regularization and fusion when modeling multiple responses, thereby facilitating the identification of associations between predictors ($X$) and responses ($Y$). It is best used when handling high-dimensional data from very few observations, since it is much slower than contending methods. Sparse conditional Gaussian graphical models [4] and Bayesian group-sparse multi-task regression model [5], for example, might be favoured chiefly for performance gains. Nevertheless, the GFLASSO is highly interpretable. The GFLASSO was recently used in a omics-integrative approach to uncover new lipid genes in maize [6].
 
 ## References
-
 1. Robert Tibshirani (1994). Regression shrinkage and selection via the Lasso. *Journal of the Royal Statistical Society*, 58, 267-288. 
 2. Seyoung Kim, Kyung-Ah Sohn, Eric P. Xing (2009). A multivariate regression approach to association analysis of a quantitative trait network. *Bioinformatics*, 25, 12:i204–i212.
 3. Chen Meng, Oana A. Zeleznik, Gerhard G. Thallinger, Bernhard Kuster, Amin M. Gholami, Aedín C. Culhane (2016). Dimension reduction techniques for the integrative analysis of multi-omics data. *Briefings in Bioinformatics*, 17, 4:628–641.
