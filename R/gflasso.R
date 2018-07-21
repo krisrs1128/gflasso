@@ -63,7 +63,7 @@ gflasso <- function(Y, X, R, opts = list()) {
 
 #' @title GFLASSO prediction
 #'
-#' @param model The model object from `gflasso`
+#' @param model The model object from `gflasso`.
 #' @param new.data The data from which to predict.
 #'
 #' @return A n x k matrix carrying all k predicted responses across all n samples
