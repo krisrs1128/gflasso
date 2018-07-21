@@ -7,7 +7,7 @@
 predict_gflasso(model, new.data)
 }
 \arguments{
-\item{model}{The model object from `gflasso`}
+\item{model}{The model object from `gflasso`.}
 
 \item{new.data}{The data from which to predict.}
 }
