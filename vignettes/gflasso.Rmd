@@ -4,7 +4,7 @@ author:
       - Francisco de Abreu e Lima
       - Kris Sankaran
 date: "2018-07-11"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document   
 vignette: >
   %\VignetteIndexEntry{Introduction to the GFLASSO}
   %\VignetteEngine{knitr::rmarkdown}
@@ -66,9 +66,9 @@ You can easily run the simulation outlined in the help page for the CV function 
 
 **Note** that user-provided error functions also work!
 
-Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y` - mean-centering in currently implemented in `gflasso` and we do advise to consider scaling `X` and `Y` beforehand. 
+Besides the inherent statistical assumptions and speed performance, the choice of tuning grid ranges depends largely on mean-centering and unit-variance scaling all columns in `X` and `Y`. Note that mean-centering and scaling are not implemented in `gflasso`, so we strongly recommend centering and scaling `X` and `Y` beforehand, as necessary.
 
-In the following example you will not need it, since you will draw random samples from a standard normal distribution. You can try deriving the fusion penalty from an unweighted correlation network, with a cutoff of $r > 0.8$:
+In the following example you will not need centering or scaling, since you will draw random samples the standard normal distribution. You can try deriving the fusion penalty from an unweighted correlation network, with a cutoff of $r > 0.8$:
 
 ``` {r simulation, fig.width = 5, fig.height = 5, fig.align = "center"}
 ?cv_gflasso
@@ -136,12 +136,12 @@ DS <- cor(BM)
 corrplot(DS)
 ```
 
-The figure above points to the interdependencies among the neuroimaging features. Try now cross-validating the GFLASSO (can take up to a couple of hours in a laptop!) and determine SNP-neuroimaging associations. 
+The figure above points to the interdependencies among the neuroimaging features. Try now cross-validating the GFLASSO (can take up to a couple of hours in a laptop!) and determine SNP-neuroimaging associations. Considering SNPs are binary, it is not necessary to center or scale the SNP data.
 
 **Note** that in the example below, the convergence tolerance and the maximum number of iterations are specified. Feel free to try different values on your own!
 
 ```{r neuroimaging2, fig.width = 5, fig.height = 5, fig.align = "center"}
-system.time(CV <- cv_gflasso(X = scale(SNP), Y = scale(BM), R = DS, nCores = 2,
+system.time(CV <- cv_gflasso(X = SNP, Y = scale(BM), R = DS, nCores = 2,
                  additionalOpts = list(delta_conv = 1e-5, iter_max = 1e5)))
 cv_plot_gflasso(CV)
 ```
@@ -149,7 +149,7 @@ cv_plot_gflasso(CV)
 By challenging the GFLASSO with pure LASSO models ($\gamma = 0$, first column), a pure fusion least squares ($\lambda = 0$, first row) and OLS ($\gamma = 0$ and $\lambda = 0$, top-left cell), we can conclude the present example is best modeled with non-zero penalty weights and consequently, with the full GFLASSO. Take the optimal CV parameters ($\lambda = 0.7$ and $\gamma = 1$) to build a GFLASSO model and interpret the resulting coefficient matrix:
 
 ```{r finalMod, fig.width = 9, fig.height = 8, fig.align = "center"}
-gfMod <- gflasso(X = scale(SNP), Y = scale(BM), R = DS, opts = list(lambda = CV$optimal$lambda,
+gfMod <- gflasso(X = SNP, Y = scale(BM), R = DS, opts = list(lambda = CV$optimal$lambda,
                                                                     gamma = CV$optimal$gamma,
                                                                     delta_conv = 1e-5,
                                                                     iter_max = 1e5))
@@ -161,7 +161,7 @@ pheatmap(gfMod$B, annotation_row = data.frame("Gene" = bgsmtr_example_data$SNP_g
 
 The figure above depicts a very large proportion of coefficients with zero or near-zero values. Although there is no obvious clustering of SNPs with respect to the genes (see row-wise annotation), there are clear associations between certains SNPs and traits. 
 
-In order to ascertain the existence of a non-random predictive mechanism, you could next repeat the procedure after permutation of the values in either $X$ or $Y$. Experimental work could help elucidate causality and mechanisms from selected SNPs. For example, SNPs that affect protein sequence and structure, disrupting the clearance of the $\beta$-Amyloid plaques that underlie Alzheimer's disease. 
+In order to ascertain the existence of a non-random predictive mechanism, you could next repeat the procedure after permutation of the values in either $X$ or $Y$. Experimental work could help elucidate causality and mechanisms from selected SNPs. For example, SNPs that affect protein sequence and structure, disrupting the clearance of the $\beta$-Amyloid plaques that underlie Alzheimer's disease. For predicting on new samples, you could use the `predict_gflasso` function.
 
 # Wrap-up
 

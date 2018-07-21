@@ -7,9 +7,9 @@
 gflasso(Y, X, R, opts = list())
 }
 \arguments{
-\item{Y}{The matrix of regression responses.}
+\item{Y}{The matrix of regression responses, scaled and centered as necessary.}
 
-\item{X}{The data matrix.}
+\item{X}{The data matrix, scaled and centered as necessary.}
 
 \item{R}{The matrix of (thresholded) correlations between columns of Y}
 
@@ -22,10 +22,8 @@ A list containing the following quantities: \cr
    X, while its columns correspond to columns of Y. \cr
   $obj The graph fused lasso objective function, over iterations.
   $Lu The automatically calculated step size. \cr
-  $means The means of X and Y, before they were subtracted out (in order to
-   perform the gradient descent operation. \cr
 reference.
 }
 \references{
-Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
+Smoothing Proximal Gradient Method for General Structured Sparse Regression
 }
