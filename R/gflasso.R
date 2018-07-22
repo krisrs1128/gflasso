@@ -1,6 +1,6 @@
 
 ################################################################################
-# Graph fused lasso
+# Graph-guided fused Lasso
 ################################################################################
 
 #' @title Merge default proximal gradient descent options
@@ -27,7 +27,7 @@ merge_proxgrad_opts <- function(opts, J, K) {
   modifyList(default_opts, opts)
 }
 
-#' @title Graph Fused Lasso via Smoothed Proximal Gradient Descent
+#' @title Graph-guided fused Lasso via Smoothed Proximal Gradient Descent
 #' @param Y The matrix of regression responses, scaled and centered as necessary.
 #' @param X The data matrix, scaled and centered as necessary.
 #' @param R The matrix of (thresholded) correlations between columns of Y

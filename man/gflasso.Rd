@@ -2,7 +2,7 @@
 % Please edit documentation in R/gflasso.R
 \name{gflasso}
 \alias{gflasso}
-\title{Graph Fused Lasso via Smoothed Proximal Gradient Descent}
+\title{Graph-guided fused Lasso via Smoothed Proximal Gradient Descent}
 \usage{
 gflasso(Y, X, R, opts = list())
 }

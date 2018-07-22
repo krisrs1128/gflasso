@@ -2,7 +2,7 @@
 
 ## File description -------------------------------------------------------------
 ##
-## Cross-validation functions for Graph-Fused lasso. This can't just be done
+## Cross-validation functions for Graph-guided fused Lasso. This can't just be done
 ## directly by caret since that package doesn't support multitask regression.
 ##
 ## author: Francisco Lima (https://github.com/monogenea), with revisions by
@@ -39,8 +39,8 @@ rmse <- function(pred, y) {
 #' B <- u %*% t(u) + matrix(rnorm(10 * 10, 0, 0.1), 10, 10)
 #' Y <- X %*% B + matrix(rnorm(100 * 10), 100, 10)
 #' R <- ifelse(cor(Y) > .8, 1, 0)
-#' system.time(testCV <- cv_gflasso(X, Y, R, nCores = 1))
-#' system.time(testCV <- cv_gflasso(X, Y, R, nCores = 2))
+#' system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 1))
+#' system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 2))
 #' cv_plot_gflasso(testCV)
 #' @export
 cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,

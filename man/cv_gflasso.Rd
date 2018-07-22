@@ -13,7 +13,7 @@ cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 
 \item{Y}{The matrix of regression responses, scaled and centered as necessary.}
 
-\item{R}{The matrix of correlations between columns of Y.}
+\item{R}{The matrix of (thresholded) correlations between columns of Y.}
 
 \item{additionalOpts}{Additional options to pass alongside lambda and gamma. See merge_proxgrad_opts().}
 
@@ -46,7 +46,7 @@ u <- matrix(rnorm(10), 10, 1)
 B <- u \%*\% t(u) + matrix(rnorm(10 * 10, 0, 0.1), 10, 10)
 Y <- X \%*\% B + matrix(rnorm(100 * 10), 100, 10)
 R <- ifelse(cor(Y) > .8, 1, 0)
-system.time(testCV <- cv_gflasso(X, Y, R, nCores = 1))
-system.time(testCV <- cv_gflasso(X, Y, R, nCores = 2))
+system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 1))
+system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 2))
 cv_plot_gflasso(testCV)
 }

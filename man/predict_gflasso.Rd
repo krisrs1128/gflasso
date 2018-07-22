@@ -2,7 +2,7 @@
 % Please edit documentation in R/gflasso.R
 \name{predict_gflasso}
 \alias{predict_gflasso}
-\title{GFLASSO prediction}
+\title{GFLasso prediction}
 \usage{
 predict_gflasso(model, new.data)
 }
