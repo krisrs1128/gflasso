@@ -134,7 +134,7 @@ DS <- cor(BM)
 corrplot(DS)
 ```
 
-The figure above points to the interdependencies among the neuroimaging features. Try now cross-validating the GFLasso (can take up to a couple of hours in a laptop!) and determine SNP-neuroimaging associations. Generally, it is not necessary to center or scale SNP data.
+The figure above points to the interdependencies among the neuroimaging features. Try now cross-validating the GFLasso (can take up to a couple of hours in a laptop!) and determine SNP-neuroimaging associations. Note that generally, it is not necessary to center or scale SNP data.
 
 **Note** that in the example below, the convergence tolerance and the maximum number of iterations are specified. Feel free to try different values on your own!
 
