@@ -1,6 +1,6 @@
 
 ################################################################################
-# Graph fused lasso
+# Graph-guided fused Lasso
 ################################################################################
 
 #' @title Merge default proximal gradient descent options
@@ -27,9 +27,9 @@ merge_proxgrad_opts <- function(opts, J, K) {
   modifyList(default_opts, opts)
 }
 
-#' @title Graph Fused Lasso via Smoothed Proximal Gradient Descent
-#' @param Y The matrix of regression responses.
-#' @param X The data matrix.
+#' @title Graph-guided fused Lasso via Smoothed Proximal Gradient Descent
+#' @param Y The matrix of regression responses, scaled and centered as necessary.
+#' @param X The data matrix, scaled and centered as necessary.
 #' @param R The matrix of (thresholded) correlations between columns of Y
 #' @param opts A potentially partially specified list of regularization and
 #' gradient descent parameters. See merge_proxgrad_opts().
@@ -38,10 +38,8 @@ merge_proxgrad_opts <- function(opts, J, K) {
 #'    X, while its columns correspond to columns of Y. \cr
 #'   $obj The graph fused lasso objective function, over iterations.
 #'   $Lu The automatically calculated step size. \cr
-#'   $means The means of X and Y, before they were subtracted out (in order to
-#'    perform the gradient descent operation. \cr
 #' reference.
-#' @references Smoothing Proximal Gradient Method for General Structured Sparse Regressoin
+#' @references Smoothing Proximal Gradient Method for General Structured Sparse Regression
 #' @export
 gflasso <- function(Y, X, R, opts = list()) {
   # get opts
@@ -50,12 +48,7 @@ gflasso <- function(Y, X, R, opts = list()) {
   # get L1 penalty matrix
   C <- opts$gamma * t(get_H(R))
 
-  # center data
-  means <- list(X = colMeans(X), Y = colMeans(Y))
-  X <- scale(X, center = T, scale = F)
-  Y <- scale(Y, center = T, scale = F)
-
-  # calculate automatic step size
+    # calculate automatic step size
   D <- (1 / 2) * ncol(X) * (ncol(Y) + ncol(C) / 2)
   mu <- opts$eps / (2 * D)
   Lu <- get_Lu(X, C, opts$lambda, opts$gamma, mu)
@@ -64,6 +57,18 @@ gflasso <- function(Y, X, R, opts = list()) {
                        iter_max = opts$iter_max, delta_conv = opts$delta_conv,
                        verbose = opts$verbose, B0 = opts$B0)
   optim_result <- accgrad(X, Y, C, accgrad_opts)
-  list(B = optim_result$B, obj = optim_result$obj, Lu = Lu, means = means)
+  list(B = optim_result$B, obj = optim_result$obj, Lu = Lu)
 }
 
+
+#' @title GFLasso prediction
+#'
+#' @param model The model object from `gflasso`.
+#' @param new.data The data from which to predict.
+#'
+#' @return A n x k matrix carrying all k predicted responses across all n samples
+#' @export
+predict_gflasso <- function(model, new.data){
+      # Simple matrix multiplication
+      return(new.data %*% model$B)
+}

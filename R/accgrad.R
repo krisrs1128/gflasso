@@ -1,6 +1,6 @@
 
 ################################################################################
-# Nesterov's accelerated gradient descent, for graph fused lasso
+# Nesterov's accelerated gradient descent, for Graph-guided fused Lasso
 ################################################################################
 
 # utils ------------------------------------------------------------------------

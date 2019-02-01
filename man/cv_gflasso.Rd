@@ -2,33 +2,33 @@
 % Please edit documentation in R/cv_gflasso.R
 \name{cv_gflasso}
 \alias{cv_gflasso}
-\title{Cross Validation for GFLasso}
+\title{k-fold Cross Validation for GFLasso}
 \usage{
 cv_gflasso(X, Y, R, additionalOpts = list(), k = 5, times = 1,
   params = seq(0, 1, by = 0.1), nCores = NULL, seed = 100,
   err_fun = rmse, err_opt = "min")
 }
 \arguments{
-\item{X}{The data matrix.}
+\item{X}{The data matrix, scaled and centered as necessary.}
 
-\item{Y}{The matrix of regression responses.}
+\item{Y}{The matrix of regression responses, scaled and centered as necessary.}
 
-\item{R}{The matrix of (thresholded) correlations between columns of Y}
+\item{R}{The matrix of (thresholded) correlations between columns of Y.}
 
-\item{additionalOpts}{Additional options to pass alongside lambda and gamma (cf. gflasso)}
+\item{additionalOpts}{Additional options to pass alongside lambda and gamma. See merge_proxgrad_opts().}
 
-\item{k}{Number of folds}
+\item{k}{Number of folds.}
 
-\item{times}{Number of repetitions (Note: Total number of metric estimates = k x times)}
+\item{times}{Number of repetitions. Total number of metric estimates = no. folds x no. times.}
 
-\item{params}{The grid of lambda and gamma values to try}
+\item{params}{The grid of lambda and gamma values to cross-validate.}
 
-\item{nCores}{The number of CPU cores to be used, >1 represents parallelized executions}
+\item{nCores}{The number of CPU cores to be used.}
 
 \item{seed}{Arbitrary number to ensure reproducibility. Defaults to 100.}
 
 \item{err_fun}{A function that computes the metric (error/goodness-of-fit) between vectors of
-predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean( (pred - y) ^ 2)).}
+predicted and true responses. Defaults to rmse(pred, y) = sqrt(mean((pred - y) ^ 2)).}
 
 \item{err_opt}{Specify whether do minimize ('min') or maximize ('max') `err_fun`.
 Default is 'min'.}
@@ -38,7 +38,7 @@ cvMatrix A matrix of errors across a grid of lambda (row) and gamma
   (column) values.
 }
 \description{
-Cross Validation for GFLasso
+k-fold Cross Validation for GFLasso
 }
 \examples{
 X <- matrix(rnorm(100 * 10), 100, 10)
@@ -46,7 +46,7 @@ u <- matrix(rnorm(10), 10, 1)
 B <- u \%*\% t(u) + matrix(rnorm(10 * 10, 0, 0.1), 10, 10)
 Y <- X \%*\% B + matrix(rnorm(100 * 10), 100, 10)
 R <- ifelse(cor(Y) > .8, 1, 0)
-system.time(testCV <- cv_gflasso(X, Y, R, nCores = 1))
-system.time(testCV <- cv_gflasso(X, Y, R, nCores = 2))
+system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 1))
+system.time(testCV <- cv_gflasso(scale(X), scale(Y), R, nCores = 2))
 cv_plot_gflasso(testCV)
 }
