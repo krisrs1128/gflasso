@@ -74,7 +74,7 @@ cv_gflasso <- function(X, Y, R, additionalOpts = list(), k = 5, times = 1,
 
       cvFUN(
         X = X, Y = Y, R = R,
-        opts = list(lambda = grid[x, 1], gamma = grid[x, 2], additionalOpts),
+        opts = modifyList(additionalOpts, list(lambda = grid[x, 1], gamma = grid[x, 2])),
         cvIndex = cvIndex
       )
     },
